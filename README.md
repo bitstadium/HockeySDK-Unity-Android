@@ -4,7 +4,7 @@ The HockeyAppUnity-Android plugin implements support for using HockeyApp in your
 
 ## Requirements
 
-* Unity 4.2 or newer.
+* Unity 4.2 or newer (older versions might work, but we haven't tested them).
 * Android 2.3 or newer.
 
 ## Installation & Setup
