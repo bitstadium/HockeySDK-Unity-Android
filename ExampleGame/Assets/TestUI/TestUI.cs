@@ -40,6 +40,7 @@ public class TestUI : MonoBehaviour{
 	private int controlHeight = 64;
 	private int horizontalMargin = 20;
 	private int space = 20;
+	private string appID = "b90dca1145f290bf8031784c196b34df";
 
 	void OnGUI(){	
 
@@ -86,8 +87,15 @@ public class TestUI : MonoBehaviour{
 		{	
 			StartCoroutine(CorutineNullCrash());	
 		}
+
+		GUI.Label(GetControlRect(9), "Features");
+
+		if(GUI.Button(GetControlRect(10), "Show Feddback Form"))
+		{	
+			StartFeedbackForm();	
+		}
 	}
-	
+
 	System.Collections.IEnumerator CorutineNullCrash(){
 
 		string crash = null;
@@ -121,6 +129,16 @@ public class TestUI : MonoBehaviour{
 		AndroidJavaObject activity = player.GetStatic<AndroidJavaObject>("currentActivity"); 
 		AndroidJavaObject exampleClass = new AndroidJavaObject("net.hockeyapp.exampleunityplugin.ExampleClass"); 
 		exampleClass.Call("forceAppCrash", activity);
+		#endif
+	}
+
+	public void StartFeedbackForm(){
+		
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
+		AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
+		AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
+		pluginClass.CallStatic("startFeedbackForm", appID , currentActivity);
 		#endif
 	}
 }

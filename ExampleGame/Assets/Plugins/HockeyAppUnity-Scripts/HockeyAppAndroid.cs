@@ -36,8 +36,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 
 public class HockeyAppAndroid : MonoBehaviour {
-
-	private const string APP_CRASHED_KEY = "CRASH";
+	
 	private const string HOCKEYAPP_BASEURL = "https://rink.hockeyapp.net/api/2/apps/";
 	private const string HOCKEYAPP_CRASHESPATH = "/crashes/upload";
 	private const int MAX_CHARS = 199800;
@@ -49,15 +48,18 @@ public class HockeyAppAndroid : MonoBehaviour {
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		DontDestroyOnLoad(gameObject);
+		if(exceptionLogging == true)
+		{
+			CheckLogs();
+		}
 		StartCrashManager(appID);
-		CheckLogs();
 		#endif
 	}
 	
 	public void OnEnable(){
 		
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		if(exceptionLogging)
+		if(exceptionLogging == true)
 		{
 			System.AppDomain.CurrentDomain.UnhandledException += new System.UnhandledExceptionEventHandler(OnHandleUnresolvedException);
 			Application.RegisterLogCallback(OnHandleLogCallback);
@@ -82,9 +84,10 @@ public class HockeyAppAndroid : MonoBehaviour {
 	private void StartCrashManager(string appID) {
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		AndroidJavaClass jc = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
-		AndroidJavaObject jo = jc.GetStatic<AndroidJavaObject>("currentActivity"); 
-		jo.Call("startHockeyAppManager", appID);
+		AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
+		AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
+		AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
+		pluginClass.CallStatic("startHockeyAppManager", appID, currentActivity);
 		#endif
 	}
 
@@ -97,9 +100,8 @@ public class HockeyAppAndroid : MonoBehaviour {
 		string version = null;
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		AndroidJavaClass jc = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
-		AndroidJavaObject jo = jc.GetStatic<AndroidJavaObject>("currentActivity"); 
-		version =  jo.Call<string>("getAppVersion");
+		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
+		version =  jc.CallStatic<string>("getAppVersion");
 		#endif
 
 		return version;
@@ -181,15 +183,13 @@ public class HockeyAppAndroid : MonoBehaviour {
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		string logsDirectoryPath = Application.persistentDataPath + "/logs/";
-		
+
 		if (Directory.Exists(logsDirectoryPath) == false)
 		{
 			Directory.CreateDirectory(logsDirectoryPath);
 		}
 		
 		DirectoryInfo info = new DirectoryInfo(logsDirectoryPath);
-		bool appDidCrashed = PlayerPrefs.HasKey(APP_CRASHED_KEY);
-		PlayerPrefs.DeleteKey(APP_CRASHED_KEY);
 		FileInfo[] files = info.GetFiles();
 		List<string> logs = new List<string>();
 
@@ -197,7 +197,7 @@ public class HockeyAppAndroid : MonoBehaviour {
 		{
 			foreach (FileInfo file in files)
 			{
-				if (exceptionLogging && appDidCrashed == true && file.Extension == ".log")
+				if (file.Extension == ".log")
 				{
 					logs.Add(file.FullName);
 				}else
@@ -206,8 +206,8 @@ public class HockeyAppAndroid : MonoBehaviour {
 				}
 			}
 		}
-		
-		if ( logs.Count > 0 && exceptionLogging)
+
+		if ( logs.Count > 0)
 		{
 			StartCoroutine(SendLogs(logs));
 		}
@@ -223,6 +223,7 @@ public class HockeyAppAndroid : MonoBehaviour {
 		{		
 			string url = HOCKEYAPP_BASEURL + appID + HOCKEYAPP_CRASHESPATH;
 			WWWForm postForm = CreateForm(log);
+			File.Delete(log);
 			string lContent = postForm.headers["Content-Type"].ToString();
 			lContent = lContent.Replace("\"", "");
 			Hashtable headers = new Hashtable();
@@ -252,7 +253,7 @@ public class HockeyAppAndroid : MonoBehaviour {
 				log +="  at " + line + "\n";
 			}
 		}
-
+		 
 		List<string> logHeaders = GetLogHeaders();
 		using (StreamWriter file = new StreamWriter(Application.persistentDataPath + "/logs/LogFile_" + logSession + ".log", true))
 		{
@@ -262,7 +263,6 @@ public class HockeyAppAndroid : MonoBehaviour {
 			}
 
 			file.WriteLine(log);
-			PlayerPrefs.SetInt(APP_CRASHED_KEY, 1);
 		}
 		#endif
 	}
