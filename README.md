@@ -21,6 +21,22 @@ The following steps illustrate how to integrate the HockeyAppUnity-Android plugi
 
 5. That's it: Build your app / Android project as usual.
 
+## Examples
+
+### Feedback Form
+
+The HockeyApp feedback form can be presented as follows:
+	
+	// Get the current activity object
+	AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
+	AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
+	
+	// Get the plugin
+	AndroidJavaClass plugin = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
+	
+	// Show the feedback form
+	plugin.CallStatic("startFeedbackForm", <YOUR-HOCKEY-APP-ID> , currentActivity);
+
 ## Licenses
 
 The Hockey SDK is provided under the following license:
