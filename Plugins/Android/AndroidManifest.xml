@@ -22,7 +22,7 @@
       android:screenOrientation="portrait"
       android:launchMode="singleTask"
       android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale"
-      android:name="net.hockeyapp.ExampleGameAndroid.UnityPlayerNativeActivity">
+      android:name="com.unity3d.player.UnityPlayerNativeActivity">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
