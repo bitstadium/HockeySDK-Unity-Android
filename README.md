@@ -19,9 +19,16 @@ The following steps illustrate how to integrate the HockeyAppUnity-Android plugi
 
 4. Select the game object in the **Hierachy** pane and fill in the App ID provided by HockeyApp (Inspector window). You will also have to enter a package identifier: Make sure that **Package ID** equals the package name of your HockeyApp app.  If you want to get more precise information about exceptions in your Unity3D scripts you can also check the **Exception Logging** property.
 
-5. You are now ready to build the project: Select **File -> Build Settings...** and switch to **Android** in the platform section. Check **Development Build**. This option affects the exception handling in C#. You will get a crash report in any case, but the data quality differs. It is recommend to enable **Development Build** for alpha and beta builds, but to disable this option for production.
+5. You are now ready to build the project: Select **File -> Build Settings...** and switch to **Android** in the platform section. Check **Development Build** (see **Build Settings** section). 
+
+6. That's it: Build your app / Android project as usual.
+
+## Build Settings ##
+
+The **Development Build** option affects the exception handling in C#. You will get a crash report in any case, but the data quality differs. It is recommend to enable it for alpha and beta builds, but to disable this option for production.
 
 **Disabled Development Build**:
+	
 	IndexOutOfRangeException: Array index is out of range.
  		at (wrapper stelemref) object:stelemref (object,intptr,object)
  		at TestUI.OnGUI ()
@@ -31,9 +38,7 @@ The following steps illustrate how to integrate the HockeyAppUnity-Android plugi
 	IndexOutOfRangeException: Array index is out of range.
  		at (wrapper stelemref) object:stelemref (object,intptr,object)
  		at TestUI.OnGUI () (at /Users/name/Documents/Workspace/HockeyAppUnity-Android/ExampleGame/Assets/TestUI/TestUI.cs:67)
-
-6. That's it: Build your app / Android project as usual.
-
+ 		
 ## Examples
 
 ### Feedback Form
