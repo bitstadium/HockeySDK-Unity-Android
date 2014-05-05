@@ -37,9 +37,10 @@ using System.Runtime.InteropServices;
 
 public class HockeyAppAndroid : MonoBehaviour {
 	
-	private const string HOCKEYAPP_BASEURL = "https://rink.hockeyapp.net/api/2/apps/";
-	private const string HOCKEYAPP_CRASHESPATH = "/crashes/upload";
-	private const int MAX_CHARS = 199800;
+	protected const string HOCKEYAPP_BASEURL = "https://rink.hockeyapp.net/api/2/apps/";
+	protected const string HOCKEYAPP_CRASHESPATH = "/crashes/upload";
+	protected const int MAX_CHARS = 199800;
+	protected const string LOG_FILE_DIR = "/logs/";
 	public string appID = "your-hockey-app-id";
 	public string packageID = "your-package-identifier";
 	public Boolean exceptionLogging = false;
@@ -48,15 +49,20 @@ public class HockeyAppAndroid : MonoBehaviour {
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		DontDestroyOnLoad(gameObject);
+		Debug.Log("Failed to write exception log to file: ");
 		if(exceptionLogging == true)
 		{
-			CheckLogs();
+			List<string> logFileDirs = GetLogFiles();
+			if(logFileDirs.Count > 0)
+			{
+				StartCoroutine(SendLogs(GetLogFiles()));
+			}
 		}
 		StartCrashManager(appID);
 		#endif
 	}
 	
-	public void OnEnable(){
+	void OnEnable(){
 		
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		if(exceptionLogging == true)
@@ -67,7 +73,7 @@ public class HockeyAppAndroid : MonoBehaviour {
 		#endif
 	}
 	
-	public void OnDisable(){
+	void OnDisable(){
 		
 		Application.RegisterLogCallback(null);
 	}
@@ -78,10 +84,10 @@ public class HockeyAppAndroid : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// Start HockeyApp for unity.
+	/// Start HockeyApp for Unity.
 	/// </summary>
 	/// <param name="appID">The app specific Identifier provided by HockeyApp</param>
-	private void StartCrashManager(string appID) {
+	protected void StartCrashManager(string appID) {
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
@@ -95,7 +101,7 @@ public class HockeyAppAndroid : MonoBehaviour {
 	/// Get the version code of the app.
 	/// </summary>
 	/// <returns>The version code of the Android app.</returns>
-	private String GetVersion(){
+	protected String GetVersion(){
 
 		string version = null;
 
@@ -108,10 +114,10 @@ public class HockeyAppAndroid : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// Collect the header fields of the log file.
+	/// Collect all header fields for the custom exception report.
 	/// </summary>
 	/// <returns>A list which contains the header fields for a log file.</returns>
-	private List<string> GetLogHeaders() {
+	protected virtual List<string> GetLogHeaders() {
 
 		List<string> list = new List<string>();
 
@@ -139,85 +145,124 @@ public class HockeyAppAndroid : MonoBehaviour {
 	/// </summary>
 	/// <param name="log">A string that contains information about the exception.</param>
 	/// <returns>The form data for the current crash report.</returns>
-	private WWWForm CreateForm(string log){
+	protected virtual WWWForm CreateForm(string log){
 
 		WWWForm form = new WWWForm();
-
-		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		FileStream fs = File.OpenRead(log);
 		byte[] bytes = null;
 
-		if (fs.Length > MAX_CHARS)
-		{
-			StreamReader reader = new StreamReader(fs);
-			reader.BaseStream.Seek( fs.Length - MAX_CHARS, SeekOrigin.Begin );
-			string resizedLog = reader.ReadToEnd();
-			reader.Close();
-
-			List<string> logHeaders = GetLogHeaders();
-			string logHeader = "";
-
-			foreach (string header in logHeaders)
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		using(FileStream fs = File.OpenRead(log)){
+			
+			if (fs.Length > MAX_CHARS)
 			{
-				logHeader += header + "\n";
+				string resizedLog = null;
+				
+				using(StreamReader reader = new StreamReader(fs)){
+					
+					reader.BaseStream.Seek( fs.Length - MAX_CHARS, SeekOrigin.Begin );
+					resizedLog = reader.ReadToEnd();
+				}
+				
+				List<string> logHeaders = GetLogHeaders();
+				string logHeader = "";
+				
+				foreach (string header in logHeaders)
+				{
+					logHeader += header + "\n";
+				}
+				
+				resizedLog = logHeader + "\n" + "[...]" + resizedLog;
+				
+				try
+				{
+					bytes = System.Text.Encoding.Default.GetBytes(resizedLog);
+				}
+				catch(ArgumentException ae)
+				{
+					if (Debug.isDebugBuild) 
+					{
+						Debug.Log("Failed to read bytes of log file: " + ae);
+					}
+				}
 			}
-
-			resizedLog = logHeader + "\n" + "[...]" + resizedLog;
-			bytes = System.Text.Encoding.Default.GetBytes(resizedLog);
-		}else
-		{
-			bytes = File.ReadAllBytes(log);
+			else
+			{
+				try
+				{
+					bytes = File.ReadAllBytes(log);
+				}
+				catch(SystemException se)
+				{
+					if (Debug.isDebugBuild) 
+					{
+						Debug.Log("Failed to read bytes of log file: " + se);
+					}
+				}
+			}
 		}
 		
-		fs.Close();
-		form.AddBinaryData("log", bytes, log, "text/plain");
+		if(bytes != null)
+		{
+			form.AddBinaryData("log", bytes, log, "text/plain");
+		}
+		
 		#endif
 		
 		return form;
 	}
 
 	/// <summary>
-	/// Handle existing exception reports.
+	/// Get a list of all existing exception reports.
 	/// </summary>
-	private void CheckLogs() {
-
-		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		string logsDirectoryPath = Application.persistentDataPath + "/logs/";
-
-		if (Directory.Exists(logsDirectoryPath) == false)
-		{
-			Directory.CreateDirectory(logsDirectoryPath);
-		}
+	/// <returns>A list which contains the filenames of the log files.</returns>
+	protected virtual List<string> GetLogFiles() {
 		
-		DirectoryInfo info = new DirectoryInfo(logsDirectoryPath);
-		FileInfo[] files = info.GetFiles();
 		List<string> logs = new List<string>();
-
-		if (files.Length > 0)
+		
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		string logsDirectoryPath = Application.persistentDataPath + LOG_FILE_DIR;
+		
+		try
 		{
-			foreach (FileInfo file in files)
+			if (Directory.Exists(logsDirectoryPath) == false)
 			{
-				if (file.Extension == ".log")
+				Directory.CreateDirectory(logsDirectoryPath);
+			}
+			
+			DirectoryInfo info = new DirectoryInfo(logsDirectoryPath);
+			FileInfo[] files = info.GetFiles();
+			
+			if (files.Length > 0)
+			{
+				foreach (FileInfo file in files)
 				{
-					logs.Add(file.FullName);
-				}else
-				{
-					File.Delete(file.FullName);
+					if (file.Extension == ".log")
+					{
+						logs.Add(file.FullName);
+					}
+					else
+					{
+						File.Delete(file.FullName);
+					}
 				}
 			}
 		}
-
-		if ( logs.Count > 0)
+		catch(Exception e)
 		{
-			StartCoroutine(SendLogs(logs));
+			if (Debug.isDebugBuild) 
+			{
+				Debug.Log("Failed to write exception log to file: " + e);
+			}
 		}
 		#endif
+		
+		return logs;
 	}
 
 	/// <summary>
-	/// Upload existing reports to HockeyApp.
+	/// Upload existing reports to HockeyApp and delete delete them locally.
 	/// </summary>
-	private IEnumerator SendLogs(List<string> logs){
+	protected virtual IEnumerator SendLogs(List<string> logs){
 		
 		foreach (string log in logs)
 		{		
@@ -234,18 +279,18 @@ public class HockeyAppAndroid : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// Create the form data for a single exception report.
+	/// Write a single exception report to disk.
 	/// </summary>
 	/// <param name="logString">A string that contains the reason for the exception.</param>
 	/// <param name="stackTrace">The stacktrace for the exception.</param>
-	private void WriteLogToDisk(string logString, string stackTrace){
+	protected virtual void WriteLogToDisk(string logString, string stackTrace){
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		string logSession = DateTime.Now.ToString("yyyy-MM-dd-HH_mm_ss_fff");
 		string log = logString.Replace("\n", " ");
 		string[]stacktraceLines = stackTrace.Split('\n');
+		
 		log = "\n" + log + "\n";
-
 		foreach (string line in stacktraceLines)
 		{
 			if(line.Length > 0)
@@ -253,26 +298,37 @@ public class HockeyAppAndroid : MonoBehaviour {
 				log +="  at " + line + "\n";
 			}
 		}
-		 
+		
 		List<string> logHeaders = GetLogHeaders();
-		using (StreamWriter file = new StreamWriter(Application.persistentDataPath + "/logs/LogFile_" + logSession + ".log", true))
+		using (StreamWriter file = new StreamWriter(Application.persistentDataPath + LOG_FILE_DIR + "LogFile_" + logSession + ".log", true))
 		{
 			foreach (string header in logHeaders)
 			{
 				file.WriteLine(header);
 			}
-
 			file.WriteLine(log);
 		}
 		#endif
 	}
 
 	/// <summary>
-	/// Handle log messages
+	/// Handle a single exception. By default the exception and its stacktrace gets written to disk.
+	/// </summary>
+	/// <param name="logString">A string that contains the reason for the exception.</param>
+	/// <param name="stackTrace">The stacktrace for the exception.</param>
+	protected virtual void HandleException(string logString, string stackTrace){
+		
+		#if (UNITY_IPHONE && !UNITY_EDITOR)
+		WriteLogToDisk(logString, stackTrace);
+		#endif
+	}
+
+	/// <summary>
+	/// Callback for handling log messages.
+	/// </summary>
 	/// <param name="logString">A string that contains the reason for the exception.</param>
 	/// <param name="stackTrace">The stacktrace for the exception.</param>
 	/// <param name="type">The type of the log message.</param>
-	/// </summary>
 	public void OnHandleLogCallback(string logString, string stackTrace, LogType type){
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
@@ -281,7 +337,7 @@ public class HockeyAppAndroid : MonoBehaviour {
 			return;	
 		}	
 
-		WriteLogToDisk(logString, stackTrace);
+		HandleException(logString, stackTrace);
 		#endif
 	}
 	
@@ -297,10 +353,9 @@ public class HockeyAppAndroid : MonoBehaviour {
 		{	
 			return;	
 		}
-		
+
 		System.Exception e	= (System.Exception)args.ExceptionObject;
-		WriteLogToDisk(e.Source, e.StackTrace);
+		HandleException(e.Source, e.StackTrace);
 		#endif
 	}
-
 }
