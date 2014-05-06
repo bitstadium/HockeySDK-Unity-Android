@@ -11,14 +11,17 @@ import android.os.Build;
 public class HockeyUnityPlugin {
 
   @TargetApi(Build.VERSION_CODES.GINGERBREAD)
-  public static void startHockeyAppManager(final String appID, final Activity currentActivity) {
+  public static void startHockeyAppManager(final String appID, final Activity currentActivity, final boolean updateManagerEnabled) {
 
     currentActivity.runOnUiThread(new Runnable()
     {
       @Override
       public void run()
       {
-        UpdateManager.register(currentActivity, appID);
+        if(updateManagerEnabled)
+        {
+          UpdateManager.register(currentActivity, appID);
+        }
         CrashManager.register(currentActivity, appID);
       }
     });
