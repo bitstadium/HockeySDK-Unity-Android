@@ -49,7 +49,6 @@ public class HockeyAppAndroid : MonoBehaviour {
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		DontDestroyOnLoad(gameObject);
-		Debug.Log("Failed to write exception log to file: ");
 		if(exceptionLogging == true)
 		{
 			List<string> logFileDirs = GetLogFiles();
@@ -268,7 +267,17 @@ public class HockeyAppAndroid : MonoBehaviour {
 		{		
 			string url = HOCKEYAPP_BASEURL + appID + HOCKEYAPP_CRASHESPATH;
 			WWWForm postForm = CreateForm(log);
-			File.Delete(log);
+			try
+			{
+				File.Delete(log);
+			}
+			catch(Exception e)
+			{
+				if (Debug.isDebugBuild) 
+				{
+					Debug.Log("Failed to delete exception log: " + e);
+				}
+			}
 			string lContent = postForm.headers["Content-Type"].ToString();
 			lContent = lContent.Replace("\"", "");
 			Hashtable headers = new Hashtable();
@@ -318,7 +327,7 @@ public class HockeyAppAndroid : MonoBehaviour {
 	/// <param name="stackTrace">The stacktrace for the exception.</param>
 	protected virtual void HandleException(string logString, string stackTrace){
 		
-		#if (UNITY_IPHONE && !UNITY_EDITOR)
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		WriteLogToDisk(logString, stackTrace);
 		#endif
 	}
