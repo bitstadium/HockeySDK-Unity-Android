@@ -17,7 +17,7 @@ The following steps illustrate how to integrate the HockeyAppUnity-Android plugi
 
 3. Create an empty game object an add the **HockeyAppAndroid.cs** as one of its components.
 
-4. Select the game object in the **Hierachy** pane and fill in the App ID provided by HockeyApp (Inspector window). You will also have to enter a package identifier: Make sure that **Package ID** equals the package name of your HockeyApp app.  If you want to get more precise information about exceptions in your Unity3D scripts you can also check the **Exception Logging** property.
+4. Select the game object in the **Hierachy** pane and fill in the App ID provided by HockeyApp (Inspector window). You will also have to enter a package identifier: Make sure that **Package ID** equals the package name of your HockeyApp app.  If you want to get more precise information about exceptions in your Unity3D scripts you can also check the **Exception Logging** property. If users should be informed about app updates from inside your app, please make sure that **Update Manager** is checked, too.
 
 5. You are now ready to build the project: Select **File -> Build Settings...** and switch to **Android** in the platform section. Check **Development Build** (see [Build Settings](#build_settings) section). 
 
