@@ -16,8 +16,8 @@ Copy the **Plugins** folder into the **Assets** directory of your Unity3D projec
 
 ![alt text](Documentation/01_add_plugin.png  "Add plugins folders")
 
-### 2) Modify Manifest.xml
-Change the value for **package** inside the AndroidManifest.xml (Assets/Plugins/Android) to the package identifier of your project.
+### 2) Modify AndroidManifest.xml
+Change the value for **package** inside the AndroidManifest.xml (*Assets/Plugins/Android*) to the package identifier of your project.
 
 ![alt text](Documentation/02_modify_manifest.png  "Add plugins folders")
 
