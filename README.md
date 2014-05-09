@@ -11,17 +11,33 @@ The HockeyAppUnity-Android plugin implements support for using HockeyApp in your
 
 The following steps illustrate how to integrate the HockeyAppUnity-Android plugin:
 
-1. Copy the **Plugins** folder into the **Assets** directory of your Unity3D project
+### 1) Import plugin
+Copy the **Plugins** folder into the **Assets** directory of your Unity3D project
 
-2. Change the value for **package** inside the AndroidManifest.xml (Assets/Plugins/Android) to the package identifier of your project.
+![alt text](Documentation/01_add_plugin.png  "Add plugins folders")
 
-3. Create an empty game object an add the **HockeyAppAndroid.cs** as one of its components.
+### 2) Modify Manifest.xml
+Change the value for **package** inside the AndroidManifest.xml (Assets/Plugins/Android) to the package identifier of your project.
 
-4. Select the game object in the **Hierachy** pane and fill in the App ID provided by HockeyApp (Inspector window). You will also have to enter a package identifier: Make sure that **Package ID** equals the package name of your HockeyApp app.  If you want to get more precise information about exceptions in your Unity3D scripts you can also check the **Exception Logging** property. If users should be informed about app updates from inside your app, please make sure that **Update Manager** is checked, too.
+![alt text](Documentation/02_modify_manifest.png  "Add plugins folders")
 
-5. You are now ready to build the project: Select **File -> Build Settings...** and switch to **Android** in the platform section. Check **Development Build** (see [Build Settings](#build_settings) section). 
+### 3) Create plugin-GameObject
+Create an empty game object (*GameObject -> Create Empty*) and add the **HockeyAppAndroid.cs** as one of its components.
 
-6. That's it: Build your app / Android project as usual.
+![alt text](Documentation/03_add_component.png  "Add component to script")
+
+Select the game object in the **Hierachy** pane and fill in the App ID provided by HockeyApp (Inspector window). You will also have to enter a package identifier: Make sure that **Package ID** equals the package name of your HockeyApp app. 
+
+If you want to get more precise information about exceptions in your Unity3D scripts you can also check the **Exception Logging** property. If users should be informed about app updates from inside your app, please make sure that **Update Manager** is checked, too.
+
+![alt text](Documentation/04_config_script.png  "Configure script")
+
+### 4) Configure build settings
+You are now ready to build the project: Select **File -> Build Settings...** and switch to **Android** in the platform section. Check **Development Build** (see Build Settings section). 
+
+![alt text](Documentation/05_config_build_settings.png  "Add plugins folders")
+
+That's it: Build your app / Android project as usual.
 
 ## <a name="build_settings"></a>Build Settings ##
 
