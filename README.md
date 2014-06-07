@@ -1,6 +1,6 @@
 ## Introduction
 
-The HockeyAppUnity-Android plugin implements support for using HockeyApp in your Unity3D-Android builds. It easily lets you keep track of crashes that have been caused by your scripts or native Java code.
+The HockeyAppUnity-Android plugin implements support for using HockeyApp in your Unity-Android builds. It easily lets you keep track of crashes that have been caused by your scripts or native Java code.
 
 ## Requirements
 
@@ -12,8 +12,8 @@ The HockeyAppUnity-Android plugin implements support for using HockeyApp in your
 The following steps illustrate how to integrate the HockeyAppUnity-Android plugin:
 
 ### 1) Import plugin
-Copy the **Plugins** folder into the **Assets** directory of your Unity3D project
-
+Copy the **Plugins** folder into the **Assets** directory of your Unity project
+Unity
 ![alt text](Documentation/01_add_plugin.png  "Add plugins folders")
 
 ### 2) Modify AndroidManifest.xml
@@ -28,7 +28,7 @@ Create an empty game object (*GameObject -> Create Empty*) and add the **HockeyA
 
 Select the game object in the **Hierachy** pane and fill in the App ID provided by HockeyApp (Inspector window). You will also have to enter a package identifier: Make sure that **Package ID** equals the package name of your HockeyApp app. 
 
-If you want to get more precise information about exceptions in your Unity3D scripts you can also check the **Exception Logging** property. If users should be informed about app updates from inside your app, please make sure that **Update Manager** is checked, too.
+If you want to get more precise information about exceptions in your Unity scripts you can also check the **Exception Logging** property. If users should be informed about app updates from inside your app, please make sure that **Update Manager** is checked, too.
 
 ![alt text](Documentation/04_config_script.png  "Configure script")
 
