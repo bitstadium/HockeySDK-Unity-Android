@@ -28,7 +28,9 @@ Create an empty game object (*GameObject -> Create Empty*) and add the **HockeyA
 
 Select the game object in the **Hierachy** pane and fill in the App ID provided by HockeyApp (Inspector window). You will also have to enter a package identifier: Make sure that **Package ID** equals the package name of your HockeyApp app. 
 
-If you want to get more precise information about exceptions in your Unity scripts you can also check the **Exception Logging** property. If users should be informed about app updates from inside your app, please make sure that **Update Manager** is checked, too.
+If you want to get more precise information about exceptions in your Unity scripts you can also check the **Exception Logging** property. 
+
+The **Auto Upload** option defines if the crash reporting feature should send crash reportings automatically without asking the user. If users should be informed about app updates from inside your app, please make sure that **Update Manager** is checked, too.
 
 ![alt text](Documentation/04_config_script.png  "Configure script")
 
