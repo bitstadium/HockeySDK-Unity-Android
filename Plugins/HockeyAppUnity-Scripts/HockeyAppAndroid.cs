@@ -43,8 +43,9 @@ public class HockeyAppAndroid : MonoBehaviour {
 	protected const string LOG_FILE_DIR = "/logs/";
 	public string appID = "your-hockey-app-id";
 	public string packageID = "your-package-identifier";
-	public bool exceptionLogging = true;
-	public bool updateManager = true;
+	public bool exceptionLogging = false;
+	public bool autoUpload = false;
+	public bool updateManager = false;
 
 	void Awake(){
 
@@ -58,7 +59,7 @@ public class HockeyAppAndroid : MonoBehaviour {
 				StartCoroutine(SendLogs(GetLogFiles()));
 			}
 		}
-		StartCrashManager(appID, updateManager);
+		StartCrashManager(appID, updateManager, autoUpload);
 		#endif
 	}
 	
@@ -87,13 +88,13 @@ public class HockeyAppAndroid : MonoBehaviour {
 	/// Start HockeyApp for Unity.
 	/// </summary>
 	/// <param name="appID">The app specific Identifier provided by HockeyApp</param>
-	protected void StartCrashManager(string appID, bool updateManagerEnabled) {
+	protected void StartCrashManager(string appID, bool updateManagerEnabled, bool autoSendEnabled) {
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
 		AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
 		AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		pluginClass.CallStatic("startHockeyAppManager", appID, currentActivity, updateManagerEnabled);
+		pluginClass.CallStatic("startHockeyAppManager", appID, currentActivity, updateManagerEnabled, autoSendEnabled);
 		#endif
 	}
 
