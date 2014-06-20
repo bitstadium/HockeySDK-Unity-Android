@@ -37,12 +37,13 @@ using System.Runtime.InteropServices;
 
 public class HockeyAppAndroid : MonoBehaviour {
 	
-	protected const string HOCKEYAPP_BASEURL = "https://rink.hockeyapp.net/api/2/apps/";
-	protected const string HOCKEYAPP_CRASHESPATH = "/crashes/upload";
+	protected const string HOCKEYAPP_BASEURL = "https://rink.hocke";
+	protected const string HOCKEYAPP_CRASHESPATH = "api/2/apps/[APPID]/crashes/upload";
 	protected const int MAX_CHARS = 199800;
 	protected const string LOG_FILE_DIR = "/logs/";
 	public string appID = "your-hockey-app-id";
 	public string packageID = "your-package-identifier";
+	public string serverURL = "your-custom-server-url";
 	public bool exceptionLogging = false;
 	public bool autoUpload = false;
 	public bool updateManager = false;
@@ -51,7 +52,7 @@ public class HockeyAppAndroid : MonoBehaviour {
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		DontDestroyOnLoad(gameObject);
-		if(exceptionLogging == true)
+		if(exceptionLogging == true  && IsConnected() == true)
 		{
 			List<string> logFileDirs = GetLogFiles();
 			if(logFileDirs.Count > 0)
@@ -59,7 +60,8 @@ public class HockeyAppAndroid : MonoBehaviour {
 				StartCoroutine(SendLogs(GetLogFiles()));
 			}
 		}
-		StartCrashManager(appID, updateManager, autoUpload);
+		string urlString = GetBaseURL();
+		StartCrashManager(urlString, appID, updateManager, autoUpload);
 		#endif
 	}
 	
@@ -88,13 +90,13 @@ public class HockeyAppAndroid : MonoBehaviour {
 	/// Start HockeyApp for Unity.
 	/// </summary>
 	/// <param name="appID">The app specific Identifier provided by HockeyApp</param>
-	protected void StartCrashManager(string appID, bool updateManagerEnabled, bool autoSendEnabled) {
+	protected void StartCrashManager(string urlString, string appID, bool updateManagerEnabled, bool autoSendEnabled) {
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
 		AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
 		AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		pluginClass.CallStatic("startHockeyAppManager", appID, currentActivity, updateManagerEnabled, autoSendEnabled);
+		pluginClass.CallStatic("startHockeyAppManager", currentActivity, urlString, appID, updateManagerEnabled, autoSendEnabled);
 		#endif
 	}
 
@@ -264,28 +266,31 @@ public class HockeyAppAndroid : MonoBehaviour {
 	/// Upload existing reports to HockeyApp and delete delete them locally.
 	/// </summary>
 	protected virtual IEnumerator SendLogs(List<string> logs){
-		
+
+		string crashPath = HOCKEYAPP_CRASHESPATH;
+		string url = GetBaseURL() + crashPath.Replace("[APPID]", appID);
+
 		foreach (string log in logs)
 		{		
-			string url = HOCKEYAPP_BASEURL + appID + HOCKEYAPP_CRASHESPATH;
 			WWWForm postForm = CreateForm(log);
-			try
-			{
-				File.Delete(log);
-			}
-			catch(Exception e)
-			{
-				if (Debug.isDebugBuild) 
-				{
-					Debug.Log("Failed to delete exception log: " + e);
-				}
-			}
 			string lContent = postForm.headers["Content-Type"].ToString();
 			lContent = lContent.Replace("\"", "");
 			Hashtable headers = new Hashtable();
 			headers.Add("Content-Type", lContent);
 			WWW www = new WWW(url, postForm.data, headers);
 			yield return www;
+
+			if (String.IsNullOrEmpty (www.error)) 
+			{
+				try 
+				{
+					File.Delete (log);
+				} 
+				catch (Exception e) 
+				{
+					if (Debug.isDebugBuild) Debug.Log ("Failed to delete exception log: " + e);
+				}
+			}
 		}
 	}
 
@@ -320,6 +325,54 @@ public class HockeyAppAndroid : MonoBehaviour {
 			file.WriteLine(log);
 		}
 		#endif
+	}
+
+	/// <summary>
+	/// Get the base url used for custom exception reports.
+	/// </summary>
+	/// <returns>A formatted base url.</returns>
+	protected virtual string GetBaseURL() {
+		
+		string baseURL ="";
+		
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+
+		string urlString = serverURL.Trim();
+		if(urlString.Length > 0)
+		{
+			baseURL = urlString;
+			
+			if(baseURL[baseURL.Length -1].Equals("/") != true){
+				///baseURL += "/";
+			}
+		}
+		else
+		{
+			baseURL = HOCKEYAPP_BASEURL;
+		}
+		#endif
+		
+		return baseURL;
+	}
+	
+	/// <summary>
+	/// Checks whether internet is reachable
+	/// </summary>
+	protected virtual bool IsConnected()
+	{
+		
+		bool connected = false;
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		
+		if  (Application.internetReachability == NetworkReachability.ReachableViaLocalAreaNetwork || 
+		     (Application.internetReachability == NetworkReachability.ReachableViaCarrierDataNetwork))
+		{
+			connected = true;
+		}
+		
+		#endif
+		
+		return connected;
 	}
 
 	/// <summary>

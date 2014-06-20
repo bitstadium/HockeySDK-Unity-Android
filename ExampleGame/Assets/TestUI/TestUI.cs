@@ -41,6 +41,7 @@ public class TestUI : MonoBehaviour{
 	private int horizontalMargin = 20;
 	private int space = 20;
 	private string appID = "b90dca1145f290bf8031784c196b34df";
+	private string serverURL = "    https://rink.hockeyapp.net/     ";
 
 	void OnGUI(){	
 
@@ -138,7 +139,7 @@ public class TestUI : MonoBehaviour{
 		AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
 		AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
 		AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		pluginClass.CallStatic("startFeedbackForm", appID , currentActivity);
+		pluginClass.CallStatic("startFeedbackForm", currentActivity, serverURL.Trim(), appID);
 		#endif
 	}
 }
