@@ -37,7 +37,7 @@ using System.Runtime.InteropServices;
 
 public class HockeyAppAndroid : MonoBehaviour {
 	
-	protected const string HOCKEYAPP_BASEURL = "https://rink.hocke";
+	protected const string HOCKEYAPP_BASEURL = "https://rink.hockeyapp.net/";
 	protected const string HOCKEYAPP_CRASHESPATH = "api/2/apps/[APPID]/crashes/upload";
 	protected const int MAX_CHARS = 199800;
 	protected const string LOG_FILE_DIR = "/logs/";
@@ -343,7 +343,7 @@ public class HockeyAppAndroid : MonoBehaviour {
 			baseURL = urlString;
 			
 			if(baseURL[baseURL.Length -1].Equals("/") != true){
-				///baseURL += "/";
+				baseURL += "/";
 			}
 		}
 		else

@@ -26,7 +26,7 @@ Create an empty game object (*GameObject -> Create Empty*) and add the **HockeyA
 
 ![alt text](Documentation/03_add_component.png  "Add component to script")
 
-Select the game object in the **Hierachy** pane and fill in the App ID provided by HockeyApp (Inspector window). You will also have to enter a package identifier: Make sure that **Package ID** equals the package name of your HockeyApp app. 
+Select the game object in the **Hierachy** pane and fill in the App ID provided by HockeyApp (Inspector window). You will also have to enter a package identifier: Make sure that **Package ID** equals the package name of your HockeyApp app. If you have your own server instance, please type in its url (**Server URL**). In most cases this field should be left blank.
 
 If you want to get more precise information about exceptions in your Unity scripts you can also check the **Exception Logging** property. 
 

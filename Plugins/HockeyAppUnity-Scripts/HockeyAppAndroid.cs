@@ -52,7 +52,6 @@ public class HockeyAppAndroid : MonoBehaviour {
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		DontDestroyOnLoad(gameObject);
-		serverURL = serverURL.Trim();
 		if(exceptionLogging == true  && IsConnected() == true)
 		{
 			List<string> logFileDirs = GetLogFiles();
@@ -61,7 +60,8 @@ public class HockeyAppAndroid : MonoBehaviour {
 				StartCoroutine(SendLogs(GetLogFiles()));
 			}
 		}
-		StartCrashManager(appID, serverURL, updateManager, autoUpload);
+		string urlString = GetBaseURL();
+		StartCrashManager(urlString, appID, updateManager, autoUpload);
 		#endif
 	}
 	
@@ -90,13 +90,13 @@ public class HockeyAppAndroid : MonoBehaviour {
 	/// Start HockeyApp for Unity.
 	/// </summary>
 	/// <param name="appID">The app specific Identifier provided by HockeyApp</param>
-	protected void StartCrashManager(string appID, string serverURL, bool updateManagerEnabled, bool autoSendEnabled) {
+	protected void StartCrashManager(string urlString, string appID, bool updateManagerEnabled, bool autoSendEnabled) {
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
 		AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
 		AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		pluginClass.CallStatic("startHockeyAppManager", currentActivity, appID, serverURL, updateManagerEnabled, autoSendEnabled);
+		pluginClass.CallStatic("startHockeyAppManager", currentActivity, urlString, appID, updateManagerEnabled, autoSendEnabled);
 		#endif
 	}
 
@@ -266,12 +266,12 @@ public class HockeyAppAndroid : MonoBehaviour {
 	/// Upload existing reports to HockeyApp and delete delete them locally.
 	/// </summary>
 	protected virtual IEnumerator SendLogs(List<string> logs){
-		
+
+		string crashPath = HOCKEYAPP_CRASHESPATH;
+		string url = GetBaseURL() + crashPath.Replace("[APPID]", appID);
+
 		foreach (string log in logs)
 		{		
-			string crashPath = HOCKEYAPP_CRASHESPATH;
-			string url = GetBaseURL() + crashPath.Replace("[APPID]", appID);
-
 			WWWForm postForm = CreateForm(log);
 			string lContent = postForm.headers["Content-Type"].ToString();
 			lContent = lContent.Replace("\"", "");
@@ -336,10 +336,11 @@ public class HockeyAppAndroid : MonoBehaviour {
 		string baseURL ="";
 		
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		
-		if(serverURL.Length > 0)
+
+		string urlString = serverURL.Trim();
+		if(urlString.Length > 0)
 		{
-			baseURL = serverURL;
+			baseURL = urlString;
 			
 			if(baseURL[baseURL.Length -1].Equals("/") != true){
 				baseURL += "/";
