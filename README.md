@@ -1,4 +1,4 @@
-## Introduction
+## Introduction (Version 1.0.3)
 
 The HockeyAppUnity-Android plugin implements support for using HockeyApp in your Unity-Android builds. It easily lets you keep track of crashes that have been caused by your scripts or native Java code.
 
