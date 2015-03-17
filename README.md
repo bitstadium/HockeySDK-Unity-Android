@@ -2,6 +2,8 @@
 
 The HockeyAppUnity-Android plugin implements support for using HockeyApp in your Unity-Android builds. It easily lets you keep track of crashes that have been caused by your scripts or native Java code.
 
+**NOTE:** For Unity 5 support please switch to *Develop*-branch.
+
 ## Requirements (Version 1.0.3)
 
 * Unity 4.2 or newer (older versions might work, but we haven't tested them).
