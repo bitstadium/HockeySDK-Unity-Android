@@ -2,26 +2,24 @@
 
 The HockeyAppUnity-Android plugin implements support for using HockeyApp in your Unity-Android builds. It easily lets you keep track of crashes that have been caused by your scripts or native Java code.
 
-**NOTE:** For Unity 5 support please switch to *Develop*-branch.
+## Requirements (Version 1.0.4)
 
-## Requirements (Version 1.0.3)
-
-* Unity 4.2 or newer (older versions might work, but we haven't tested them).
-* Android 2.1or newer.
+* Unity 5.0 or newer (SDK versions with Unity 4 support can be found at the [Unity Asset Store](https://www.assetstore.unity3d.com/en/?gclid=CO) or by switching to the 1.0.3 tag on GitHub).
+* Android 2.1 or newer.
 
 ## Installation & Setup
 
 The following steps illustrate how to integrate the HockeyAppUnity-Android plugin:
 
 ### 1) Import plugin
-Copy the **Plugins** folder into the **Assets** directory of your Unity project
+Copy the **HockeyAppUnityAndroid** folder into the **Assets** directory of your Unity project
 Unity
-![alt text](Documentation/01_add_plugin.png  "Add plugins folders")
+![alt text](Documentation/01_add_plugin.png  "Add HockeyAppUnityAndroid folders")
 
 ### 2) Modify AndroidManifest.xml
-Change the value for **package** inside the AndroidManifest.xml (*Assets/Plugins/Android*) to the package identifier of your project.
+Change the value for **package** inside the AndroidManifest.xml (*Assets/HockeyAppUnityAndroid*) to the package identifier of your project.
 
-![alt text](Documentation/02_modify_manifest.png  "Add plugins folders")
+![alt text](Documentation/02_modify_manifest.png  "Modify manifest")
 
 ### 3) Create plugin-GameObject
 Create an empty game object (*GameObject -> Create Empty*) and add the **HockeyAppAndroid.cs** as one of its components.
@@ -39,7 +37,7 @@ The **Auto Upload** option defines if the crash reporting feature should send cr
 ### 4) Configure build settings
 You are now ready to build the project: Select **File -> Build Settings...** and switch to **Android** in the platform section. Check **Development Build** (see Build Settings section). 
 
-![alt text](Documentation/05_config_build_settings.png  "Add plugins folders")
+![alt text](Documentation/05_config_build_settings.png  "Configure build settings")
 
 That's it: Build your app / Android project as usual.
 

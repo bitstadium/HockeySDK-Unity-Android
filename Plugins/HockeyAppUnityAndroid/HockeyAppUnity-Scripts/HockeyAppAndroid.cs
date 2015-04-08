@@ -2,9 +2,9 @@
  *
  * Author: Christoph Wendt
  * 
- * Version: 1.0.3
+ * Version: 1.0.4
  *
- * Copyright (c) 2013-2014 HockeyApp, Bit Stadium GmbH.
+ * Copyright (c) 2013-2015 HockeyApp, Bit Stadium GmbH.
  * All rights reserved.
  * 
  * Permission is hereby granted, free of charge, to any person
@@ -277,7 +277,7 @@ public class HockeyAppAndroid : MonoBehaviour {
 			WWWForm postForm = CreateForm(log);
 			string lContent = postForm.headers["Content-Type"].ToString();
 			lContent = lContent.Replace("\"", "");
-			Hashtable headers = new Hashtable();
+			Dictionary<string,string> headers = new Dictionary<string,string>();
 			headers.Add("Content-Type", lContent);
 			WWW www = new WWW(url, postForm.data, headers);
 			yield return www;
