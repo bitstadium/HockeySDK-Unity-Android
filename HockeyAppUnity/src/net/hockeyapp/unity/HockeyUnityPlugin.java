@@ -89,7 +89,7 @@ public class HockeyUnityPlugin {
 			@Override
 			public void run() {
 				if (updateManagerEnabled) {
-					UpdateManager.register(currentActivity, serverURL, appID, null);
+					UpdateManager.register(currentActivity, serverURL, appID, null, true);
 				}
 				CrashManager.register(currentActivity, serverURL, appID,
 						new CrashManagerListener() {
