@@ -42,8 +42,11 @@ public class TestUI : MonoBehaviour{
 	private int controlHeight = 64;
 	private int horizontalMargin = 20;
 	private int space = 20;
+
+	#if (UNITY_ANDROID && !UNITY_EDITOR)
 	private string appID = "b90dca1145f290bf8031784c196b34df";
 	private string serverURL = "    https://rink.hockeyapp.net/     ";
+	#endif
 
 	void OnGUI(){	
 
@@ -148,7 +151,7 @@ public class TestUI : MonoBehaviour{
 		#endif
 	}
 
-	public void StartFeedbackForm(){
+	public void ShowFeedbackForm(){
 		
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
