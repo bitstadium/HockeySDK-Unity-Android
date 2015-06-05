@@ -2,10 +2,20 @@
 
 The HockeyAppUnity-Android plugin implements support for using HockeyApp in your Unity-Android builds. It easily lets you keep track of crashes that have been caused by your scripts or native Java code.
 
-## Requirements (Version 1.0.4)
+## Requirements (Version 1.0.5)
 
 * Unity 5.0 or newer (SDK versions with Unity 4 support can be found at the [Unity Asset Store](https://www.assetstore.unity3d.com/en/?gclid=CO) or by switching to the appropriate release branch on GitHub).
 * Android 2.1 or newer.
+
+###Changelog:###
+
+1.0.5:
+
+- Update HockeApp SDK Android version to 3.5
+- Fix warnings
+- Extend demo project: Add handled managed exception
+
+
 
 ## Installation & Setup
 
@@ -77,7 +87,7 @@ The HockeyApp feedback form can be presented as follows:
 
 The Hockey SDK is provided under the following license:
 
-    Copyright (c) 2011, 2012 HockeyApp, Bit Stadium GmbH.
+    Copyright (c) 2011 - 2015 HockeyApp, Bit Stadium GmbH.
 
     Permission is hereby granted, free of charge, to any person
     obtaining a copy of this software and associated documentation
