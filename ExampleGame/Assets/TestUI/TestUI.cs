@@ -2,9 +2,9 @@
  *
  * Author: Christoph Wendt
  * 
- * Version: 1.0.3
+ * Version: 1.0.5
  * 
- * Copyright (c) 2013-2014 HockeyApp, Bit Stadium GmbH.
+ * Copyright (c) 2013-2015 HockeyApp, Bit Stadium GmbH.
  * All rights reserved.
  * 
  * Permission is hereby granted, free of charge, to any person
@@ -80,35 +80,31 @@ public class TestUI : MonoBehaviour{
 			StartCoroutine(CorutineCrash());	
 		}
 
-		if(GUI.Button(GetControlRect(7), "Null Pointer Exception"))
-		{
-			string crash = null;
-			crash	= crash.ToLower();
+		if(GUI.Button(GetControlRect(7), "Handled Null Pointer Exception"))
+		{	
+			try {
+				NullReferenceException();
+			} catch (Exception e) {
+				throw new Exception("Null Pointer Exception");
+			}	
 		}
 
-		if(GUI.Button(GetControlRect(8), "Coroutine Null Exception"))
+		if(GUI.Button(GetControlRect(8), "Null Pointer Exception"))
+		{
+			NullReferenceException();
+		}
+
+		if(GUI.Button(GetControlRect(9), "Coroutine Null Exception"))
 		{	
 			StartCoroutine(CorutineNullCrash());	
 		}
 
-		GUI.Label(GetControlRect(9), "Features");
+		GUI.Label(GetControlRect(10), "Features");
 
-		if(GUI.Button(GetControlRect(10), "Show Feddback Form"))
+		if(GUI.Button(GetControlRect(11), "Show Feedback Form"))
 		{	
-			StartFeedbackForm();	
+			ShowFeedbackForm();
 		}
-	}
-
-	System.Collections.IEnumerator CorutineNullCrash(){
-
-		string crash = null;
-		crash	= crash.ToLower();
-		yield break;
-	}
-	
-	System.Collections.IEnumerator CorutineCrash(){	
-
-		throw new System.Exception("Custom Coroutine Exception");
 	}
 
 	private Rect GetControlRect(int controlIndex){
@@ -125,6 +121,23 @@ public class TestUI : MonoBehaviour{
 		GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(resizeRatio.x, resizeRatio.y, 1.0f));
 	}
 
+	System.Collections.IEnumerator CorutineNullCrash(){
+
+		string crash = null;
+		crash	= crash.ToLower();
+		yield break;
+	}
+	
+	System.Collections.IEnumerator CorutineCrash(){	
+
+		throw new System.Exception("Custom Coroutine Exception");
+	}
+
+	public void NullReferenceException(){
+		object testObject = null;
+		testObject.GetHashCode();
+	}
+	
 	public void ForceAppCrash(){
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
