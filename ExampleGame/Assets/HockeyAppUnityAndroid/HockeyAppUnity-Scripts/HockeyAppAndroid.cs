@@ -119,6 +119,39 @@ public class HockeyAppAndroid : MonoBehaviour {
 	}
 
 	/// <summary>
+	/// Get the SDK version.
+	/// </summary>
+	/// <returns>The SDK version.</returns>
+	protected String GetSdkVersion(){
+		
+		string sdkVersion = null;
+		
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
+		sdkVersion =  jc.CallStatic<string>("getSdkVersion");
+		#endif
+		
+		return sdkVersion;
+	}
+
+	/// <summary>
+	/// Get the name of the SDK.
+	/// </summary>
+	/// <returns>The name of the SDK.</returns>
+	protected String GetSdkName(){
+		
+		string sdkName = null;
+		
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
+		sdkName =  jc.CallStatic<string>("getSdkName");
+		#endif
+		
+		return sdkName;
+	}
+
+
+	/// <summary>
 	/// Collect all header fields for the custom exception report.
 	/// </summary>
 	/// <returns>A list which contains the header fields for a log file.</returns>
@@ -271,6 +304,12 @@ public class HockeyAppAndroid : MonoBehaviour {
 
 		string crashPath = HOCKEYAPP_CRASHESPATH;
 		string url = GetBaseURL() + crashPath.Replace("[APPID]", appID);
+
+		string sdkVersion = GetSdkVersion ();
+		string sdkName = GetSdkName ();
+		if (sdkName != null && sdkVersion != null) {
+			url += "?sdk=" + sdkName + "&sdk_version=" + sdkVersion;
+		}
 
 		foreach (string log in logs)
 		{		
