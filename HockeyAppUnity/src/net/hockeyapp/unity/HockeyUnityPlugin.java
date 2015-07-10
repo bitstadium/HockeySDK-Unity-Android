@@ -127,9 +127,20 @@ public class HockeyUnityPlugin {
 		});
 	}
 
-	public static String getAppVersion() {
-
+	public static String getVersionCode() {
 		return Constants.APP_VERSION;
+	}
+	
+	public static String getVersionName() {
+		return Constants.APP_VERSION_NAME;
+	}
+	
+	public static String getSdkName() {
+		return Constants.SDK_NAME;
+	}
+	
+	public static String getSdkVersion() {
+		return Constants.SDK_VERSION;
 	}
 
 }
