@@ -2,7 +2,7 @@
  *
  * Author: Christoph Wendt
  * 
- * Version: 1.0.5
+ * Version: 1.0.6
  *
  * Copyright (c) 2013-2015 HockeyApp, Bit Stadium GmbH.
  * All rights reserved.
@@ -41,6 +41,7 @@ public class HockeyAppAndroid : MonoBehaviour {
 	
 	protected const string HOCKEYAPP_BASEURL = "https://rink.hockeyapp.net/";
 	protected const string HOCKEYAPP_CRASHESPATH = "api/2/apps/[APPID]/crashes/upload";
+
 	protected const int MAX_CHARS = 199800;
 	protected const string LOG_FILE_DIR = "/logs/";
 	public string appID = "your-hockey-app-id";
@@ -106,17 +107,66 @@ public class HockeyAppAndroid : MonoBehaviour {
 	/// Get the version code of the app.
 	/// </summary>
 	/// <returns>The version code of the Android app.</returns>
-	protected String GetVersion(){
+	protected String GetVersionCode(){
 
-		string version = null;
+		string versionCode = null;
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		version =  jc.CallStatic<string>("getAppVersion");
+		versionCode =  jc.CallStatic<string>("getVersionCode");
 		#endif
 
-		return version;
+		return versionCode;
 	}
+
+	/// <summary>
+	/// Get the version name of the app.
+	/// </summary>
+	/// <returns>The version name of the Android app.</returns>
+	protected String GetVersionName(){
+		
+		string versionName = null;
+		
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
+		versionName =  jc.CallStatic<string>("getVersionName");
+		#endif
+		
+		return versionName;
+	}
+
+	/// <summary>
+	/// Get the SDK version.
+	/// </summary>
+	/// <returns>The SDK version.</returns>
+	protected String GetSdkVersion(){
+		
+		string sdkVersion = null;
+		
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
+		sdkVersion =  jc.CallStatic<string>("getSdkVersion");
+		#endif
+		
+		return sdkVersion;
+	}
+
+	/// <summary>
+	/// Get the name of the SDK.
+	/// </summary>
+	/// <returns>The name of the SDK.</returns>
+	protected String GetSdkName(){
+		
+		string sdkName = null;
+		
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
+		sdkName =  jc.CallStatic<string>("getSdkName");
+		#endif
+		
+		return sdkName;
+	}
+
 
 	/// <summary>
 	/// Collect all header fields for the custom exception report.
@@ -130,8 +180,11 @@ public class HockeyAppAndroid : MonoBehaviour {
 
 		list.Add("Package: " + packageID);
 
-		string appVersion = GetVersion();
-		list.Add("Version: " + appVersion);
+		string versionCode = GetVersionCode();
+		list.Add("Version Code: " + versionCode);
+
+		string versionName = GetVersionName();
+		list.Add("Version Name: " + versionName);
 
 		string[] versionComponents = SystemInfo.operatingSystem.Split('/');
 		string osVersion = "Android: " + versionComponents[0].Replace("Android OS ", "");
@@ -271,6 +324,12 @@ public class HockeyAppAndroid : MonoBehaviour {
 
 		string crashPath = HOCKEYAPP_CRASHESPATH;
 		string url = GetBaseURL() + crashPath.Replace("[APPID]", appID);
+
+		string sdkVersion = GetSdkVersion ();
+		string sdkName = GetSdkName ();
+		if (sdkName != null && sdkVersion != null) {
+			url += "?sdk=" + sdkName + "&sdk_version=" + sdkVersion;
+		}
 
 		foreach (string log in logs)
 		{		
