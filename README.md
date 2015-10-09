@@ -2,13 +2,18 @@
 
 The HockeyAppUnity-Android plugin implements support for using HockeyApp in your Unity-Android builds. It easily lets you keep track of crashes that have been caused by your scripts or native Java code.
 
-## Requirements (Version 1.0.6)
+## Requirements (Version 1.0.7)
 
 * Unity 5.0 or newer (SDK versions with Unity 4 support can be found at the [Unity Asset Store](https://www.assetstore.unity3d.com/en/?gclid=CO) or by switching to the 1.0.3 tag on GitHub).
 * Android 2.1 or newer.
 
 ###Changelog:###
 
+1.0.7:
+
+- Update SDK to use HockeySDK 3.6.1 for Android
+- Fix minor bug
+	
 1.0.6:
 
 - Append SDK and App information to crash reports
@@ -81,6 +86,10 @@ The HockeyApp feedback form can be presented as follows:
 	
 	// Show the feedback form
 	plugin.CallStatic("startFeedbackForm", <YOUR-HOCKEY-APP-ID> , currentActivity);
+
+## Contributor License
+
+You must sign a [Contributor License Agreement](https://cla.microsoft.com/) before submitting your pull request. To complete the Contributor License Agreement (CLA), you will need to submit a request via the [form](https://cla.microsoft.com/) and then electronically sign the CLA when you receive the email containing the link to the document. You need to sign the CLA only once to cover submission to any Microsoft OSS project. 
 
 ## Licenses
 

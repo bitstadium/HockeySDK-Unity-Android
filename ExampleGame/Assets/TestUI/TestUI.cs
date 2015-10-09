@@ -157,7 +157,7 @@ public class TestUI : MonoBehaviour{
 		AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
 		AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
 		AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		pluginClass.CallStatic("startFeedbackForm", currentActivity, serverURL.Trim(), appID);
+		pluginClass.CallStatic("startFeedbackForm", currentActivity);
 		#endif
 	}
 }

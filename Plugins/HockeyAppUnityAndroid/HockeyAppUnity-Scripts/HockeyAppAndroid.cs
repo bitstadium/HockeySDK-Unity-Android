@@ -2,7 +2,7 @@
  *
  * Author: Christoph Wendt
  * 
- * Version: 1.0.6
+ * Version: 1.0.7
  *
  * Copyright (c) 2013-2015 HockeyApp, Bit Stadium GmbH.
  * All rights reserved.
@@ -60,7 +60,7 @@ public class HockeyAppAndroid : MonoBehaviour {
 			List<string> logFileDirs = GetLogFiles();
 			if(logFileDirs.Count > 0)
 			{
-				StartCoroutine(SendLogs(GetLogFiles()));
+				StartCoroutine(SendLogs(logFileDirs));
 			}
 		}
 		string urlString = GetBaseURL();
@@ -325,11 +325,13 @@ public class HockeyAppAndroid : MonoBehaviour {
 		string crashPath = HOCKEYAPP_CRASHESPATH;
 		string url = GetBaseURL() + crashPath.Replace("[APPID]", appID);
 
-		string sdkVersion = GetSdkVersion ();
-		string sdkName = GetSdkName ();
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		string sdkVersion = HockeyApp_GetSdkVersion ();
+		string sdkName = HockeyApp_GetSdkName ();
 		if (sdkName != null && sdkVersion != null) {
-			url += "?sdk=" + sdkName + "&sdk_version=" + sdkVersion;
+			url += "?sdk=" + WWW.EscapeURL(sdkName) + "&sdk_version=" + sdkVersion;
 		}
+		#endif
 
 		foreach (string log in logs)
 		{		
