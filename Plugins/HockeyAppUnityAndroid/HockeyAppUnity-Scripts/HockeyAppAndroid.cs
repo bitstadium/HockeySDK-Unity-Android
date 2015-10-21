@@ -326,10 +326,10 @@ public class HockeyAppAndroid : MonoBehaviour {
 		string url = GetBaseURL() + crashPath.Replace("[APPID]", appID);
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		string sdkVersion = HockeyApp_GetSdkVersion ();
-		string sdkName = HockeyApp_GetSdkName ();
+		string sdkVersion = GetSdkVersion ();
+		string sdkName = GetSdkName ();
 		if (sdkName != null && sdkVersion != null) {
-			url += "?sdk=" + WWW.EscapeURL(sdkName) + "&sdk_version=" + sdkVersion;
+			url+= "?sdk=" + WWW.EscapeURL(sdkName) + "&sdk_version=" + sdkVersion;
 		}
 		#endif
 
