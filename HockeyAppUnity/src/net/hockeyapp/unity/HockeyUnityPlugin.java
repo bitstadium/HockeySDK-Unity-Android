@@ -4,7 +4,7 @@
  * <pre>
  * Copyright (c) 2011-2015 Bit Stadium GmbH
  * 
- * Version 1.1.0
+ * Version 1.0.8
  * 
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
