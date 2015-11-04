@@ -2,7 +2,7 @@
  *
  * Author: Christoph Wendt
  * 
- * Version: 1.0.7
+ * Version: 1.0.8
  *
  * Copyright (c) 2013-2015 HockeyApp, Bit Stadium GmbH.
  * All rights reserved.
@@ -47,8 +47,8 @@ public class HockeyAppAndroid : MonoBehaviour {
 	public string appID = "your-hockey-app-id";
 	public string packageID = "your-package-identifier";
 	public string serverURL = "your-custom-server-url";
-	public bool exceptionLogging = false;
 	public bool autoUpload = false;
+	public bool exceptionLogging = false;
 	public bool updateManager = false;
 
 	void Awake(){
