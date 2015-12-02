@@ -206,9 +206,9 @@ public class HockeyAppAndroid : MonoBehaviour {
 	protected virtual WWWForm CreateForm(string log){
 
 		WWWForm form = new WWWForm();
-		byte[] bytes = null;
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		byte[] bytes = null;
 		using(FileStream fs = File.OpenRead(log)){
 			
 			if (fs.Length > MAX_CHARS)
