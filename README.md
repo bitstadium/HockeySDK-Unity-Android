@@ -2,7 +2,14 @@
 
 The HockeyAppUnity-Android plugin implements support for using HockeyApp in your Unity-Android builds. It easily lets you keep track of crashes that have been caused by your scripts or native Java code.
 
-## Requirements (Version 1.0.8)
+1. [Requirements (Version 1.0.8)](#1)
+2. [Installation & Setup](#2)
+3. [Examples](#3)
+4. [Troubleshooting](#4)
+5. [Contributor License](#5)
+6. [Licenses](#6)
+
+## <a name="1"></a>Requirements (Version 1.0.8)
 
 * Unity 5.0 or newer (SDK versions with Unity 4 support can be found at the [Unity Asset Store](https://www.assetstore.unity3d.com/en/?gclid=CO) or by switching to the 1.0.3 tag on GitHub).
 * Android 2.1 or newer.
@@ -26,7 +33,7 @@ The HockeyAppUnity-Android plugin implements support for using HockeyApp in your
 	* SDK version
 	* App version name
 
-## Installation & Setup
+## <a name="2"></a>Installation & Setup
 
 The following steps illustrate how to integrate the HockeyAppUnity-Android plugin:
 
@@ -76,27 +83,55 @@ The **Development Build** option affects the exception handling in C#. You will 
  		at (wrapper stelemref) object:stelemref (object,intptr,object)
  		at TestUI.OnGUI () (at /Users/name/Documents/Workspace/HockeyAppUnity-Android/ExampleGame/Assets/TestUI/TestUI.cs:67)
  		
-## Examples
+## <a name="3"></a>Examples
 
 ### Feedback Form
 
 The HockeyApp feedback form can be presented as follows:
-	
-	// Get the current activity object
-	AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
-	AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
-	
-	// Get the plugin
-	AndroidJavaClass plugin = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-	
-	// Show the feedback form
-	plugin.CallStatic("startFeedbackForm", <YOUR-HOCKEY-APP-ID> , currentActivity);
 
-## Contributor License
+```	java
+// Get the current activity object
+AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
+AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
+	
+// Get the plugin
+AndroidJavaClass plugin = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
+	
+// Show the feedback form
+plugin.CallStatic("startFeedbackForm", <YOUR-HOCKEY-APP-ID> , currentActivity);
+```
+
+## <a name="4"></a>Troubleshooting
+
+If you have any problems with compiling or running the Unity Android project, please check the following points:
+
+### Crash: Unable to find explicit activity class (UpdateActivity/FeedbackActivity)
+
+If you get an exception with the following reason
+
+	Unable to find explicit activity class {net.hockeyapp.ExampleGame/net.hockeyapp.android.UpdateActivity}
+	
+it is most likely caused by a corrupted manifest file merge. To fix that issue, please check the **Google Android Project** box inside the Android Build Settings and click the **Export** button.
+
+![alt text](Documentation/06_trouble_manifest_merge.png  "Export Android Studio project")
+
+Next, open the Android Studio project and define the missing activities inside the manifest file:
+	
+```xml
+<application>
+ 	... 
+	<activity android:name="net.hockeyapp.android.UpdateActivity" />
+	<activity android:name="net.hockeyapp.android.FeedbackActivity" />
+</application>
+```
+
+Build and run the project inside Android Studio.
+
+## <a name="5"></a>Contributor License
 
 You must sign a [Contributor License Agreement](https://cla.microsoft.com/) before submitting your pull request. To complete the Contributor License Agreement (CLA), you will need to submit a request via the [form](https://cla.microsoft.com/) and then electronically sign the CLA when you receive the email containing the link to the document. You need to sign the CLA only once to cover submission to any Microsoft OSS project. 
 
-## Licenses
+## <a name="6"></a>Licenses
 
 The Hockey SDK is provided under the following license:
 
