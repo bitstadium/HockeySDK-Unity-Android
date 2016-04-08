@@ -2,11 +2,11 @@
  *
  * Author: Christoph Wendt
  * 
- * Version: 1.0.8
+ * Version: 1.1.0-beta.1
  *
- * Copyright (c) 2013-2015 HockeyApp, Bit Stadium GmbH.
+ * Copyright (c) HockeyApp, Bit Stadium GmbH.
  * All rights reserved.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -15,10 +15,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -41,15 +41,23 @@ public class HockeyAppAndroid : MonoBehaviour {
 	
 	protected const string HOCKEYAPP_BASEURL = "https://rink.hockeyapp.net/";
 	protected const string HOCKEYAPP_CRASHESPATH = "api/2/apps/[APPID]/crashes/upload";
-
 	protected const int MAX_CHARS = 199800;
 	protected const string LOG_FILE_DIR = "/logs/";
+
+	[Header("HockeyApp Setup")]
 	public string appID = "your-hockey-app-id";
 	public string packageID = "your-package-identifier";
 	public string serverURL = "your-custom-server-url";
-	public bool autoUpload = false;
-	public bool exceptionLogging = false;
-	public bool updateManager = false;
+
+	[Header("Crashes & Exceptions")]
+	public bool autoUploadCrashes = false;
+	public bool exceptionLogging = true;
+
+	[Header("Metrics")]
+	public bool userMetrics = true;
+
+	[Header("Version Updates")]
+	public bool updateAlert = true;
 
 	void Awake(){
 
@@ -64,7 +72,7 @@ public class HockeyAppAndroid : MonoBehaviour {
 			}
 		}
 		string urlString = GetBaseURL();
-		StartCrashManager(urlString, appID, updateManager, autoUpload);
+		StartCrashManager(urlString, appID, updateAlert, userMetrics, autoUploadCrashes);
 		#endif
 	}
 	
@@ -93,13 +101,13 @@ public class HockeyAppAndroid : MonoBehaviour {
 	/// Start HockeyApp for Unity.
 	/// </summary>
 	/// <param name="appID">The app specific Identifier provided by HockeyApp</param>
-	protected void StartCrashManager(string urlString, string appID, bool updateManagerEnabled, bool autoSendEnabled) {
+	protected void StartCrashManager(string urlString, string appID, bool updateManagerEnabled, bool userMetricsEnabled, bool autoSendEnabled) {
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
 		AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
 		AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		pluginClass.CallStatic("startHockeyAppManager", currentActivity, urlString, appID, updateManagerEnabled, autoSendEnabled);
+		pluginClass.CallStatic("startHockeyAppManager", currentActivity, urlString, appID, updateManagerEnabled, userMetricsEnabled, autoSendEnabled);
 		#endif
 	}
 
@@ -206,9 +214,9 @@ public class HockeyAppAndroid : MonoBehaviour {
 	protected virtual WWWForm CreateForm(string log){
 
 		WWWForm form = new WWWForm();
-		byte[] bytes = null;
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		byte[] bytes = null;
 		using(FileStream fs = File.OpenRead(log)){
 			
 			if (fs.Length > MAX_CHARS)
@@ -326,10 +334,9 @@ public class HockeyAppAndroid : MonoBehaviour {
 		string url = GetBaseURL() + crashPath.Replace("[APPID]", appID);
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		string sdkVersion = GetSdkVersion ();
 		string sdkName = GetSdkName ();
-		if (sdkName != null && sdkVersion != null) {
-			url+= "?sdk=" + WWW.EscapeURL(sdkName) + "&sdk_version=" + sdkVersion;
+		if (sdkName != null) {
+			url+= "?sdk=" + WWW.EscapeURL(sdkName);
 		}
 		#endif
 
