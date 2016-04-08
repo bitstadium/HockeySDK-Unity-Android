@@ -1,11 +1,13 @@
 /**
  * <h3>License</h3>
- * 
+ *
  * <pre>
- * Copyright (c) 2011-2015 Bit Stadium GmbH
- * 
- * Version 1.0.8
- * 
+ *
+ * Version 1.1.0-beta.1
+ *
+ * Copyright (c) HockeyApp, Bit Stadium GmbH.
+ * All rights reserved.
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -14,10 +16,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -38,6 +40,8 @@ import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.CrashManagerListener;
 import net.hockeyapp.android.FeedbackManager;
 import net.hockeyapp.android.UpdateManager;
+import net.hockeyapp.android.metrics.MetricsManager;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
@@ -59,12 +63,15 @@ public class HockeyUnityPlugin {
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
 
 	public static void startHockeyAppManager(final Activity currentActivity, final String serverURL, 
-			final String appID, final boolean updateManagerEnabled, final boolean autoSendEnabled) {
+			final String appID, final boolean updateManagerEnabled, final boolean userMetricsEnabled, final boolean autoSendEnabled) {
 		currentActivity.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
 				if (updateManagerEnabled) {
 					registerUpdateManager(currentActivity, serverURL, appID);
+				}
+				if (userMetricsEnabled) {
+					registerMetricsManager(currentActivity, appID);
 				}
 				registerCrashManager(currentActivity, serverURL, appID, autoSendEnabled);
 				registerFeedbackManager(currentActivity, serverURL, appID);
@@ -131,6 +138,22 @@ public class HockeyUnityPlugin {
 
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
 	/**
+	 * Configures and starts the metrics module.
+	 *
+	 * @param currentActivity		the context needed for starting this manager.
+	 * @param appID					the app identifier of your app.
+	 */
+	public static void registerMetricsManager(final Activity currentActivity, final String appID){
+		currentActivity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+                MetricsManager.register(currentActivity, currentActivity.getApplication(), appID);
+            }
+        });
+	}
+
+	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
+	/**
 	 * Enables crash reporting, feedback, and app updates. If you don't want to enable all features or if you need more options to configure them, use specific register methods instead.
 	 * 
 	 * @param currentActivity	the context needed for starting this manager.
@@ -146,6 +169,7 @@ public class HockeyUnityPlugin {
 				registerUpdateManager(currentActivity, serverURL, appID);	
 				registerCrashManager(currentActivity, serverURL, appID, true);
 				registerFeedbackManager(currentActivity, serverURL, appID);
+				registerMetricsManager(currentActivity, appID);
 			}
 		});
 	}
@@ -173,16 +197,8 @@ public class HockeyUnityPlugin {
 	/**
 	 * @return the name of the base HockeyApp SDK.
 	 */
-	public static String getSdkName() {
-		return Constants.SDK_NAME;
-	}
+	public static String getSdkName() {return Constants.SDK_NAME; }
 
-	/**
-	 * @return the version of the base HockeyApp SDK.
-	 */
-	public static String getSdkVersion() {
-		return Constants.SDK_VERSION;
-	}
 	//---------------------------------------------------------------------------------------
 	//endregion
 
