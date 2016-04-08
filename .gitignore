@@ -15,6 +15,14 @@ proguard/
 *.ipr
 *.iws
 .idea/
+gen-external-apklibs/
+out/
+target/
+.gradle/
+build/
+/*/build/
+*.log
+infer-out
 
 # =============== #
 # Unity generated #
