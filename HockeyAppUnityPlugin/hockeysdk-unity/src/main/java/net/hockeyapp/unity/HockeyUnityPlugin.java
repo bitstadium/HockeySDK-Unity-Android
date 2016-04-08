@@ -79,6 +79,7 @@ public class HockeyUnityPlugin {
 				}
 				registerCrashManager(currentActivity, serverURL, appID, autoSendEnabled);
 				registerFeedbackManager(currentActivity, serverURL, appID);
+				registerLoginManager(currentActivity, secret, loginMode);
 			}
 		});
 	}
@@ -119,6 +120,25 @@ public class HockeyUnityPlugin {
 						return autoSendEnabled;
 					}
 				});
+			}
+		});
+	}
+
+	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
+	/**
+	 * Configures and starts the login module.
+	 *
+	 * @param currentActivity		the context needed for starting this manager.
+	 * @param secret				the URL of the HockeyApp instance.
+	 * @param loginMode				the app identifier of your app.
+	 */
+	public static void registerLoginManager(final Activity currentActivity, final String secret, final int loginMode){
+
+		currentActivity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				LoginManager.register(currentActivity, secret, loginMode);
+				LoginManager.verifyLogin(currentActivity, currentActivity.getIntent());
 			}
 		});
 	}
