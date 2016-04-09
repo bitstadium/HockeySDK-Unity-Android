@@ -44,10 +44,21 @@ public class HockeyAppAndroid : MonoBehaviour {
 	protected const int MAX_CHARS = 199800;
 	protected const string LOG_FILE_DIR = "/logs/";
 
+	public enum AuthenticatorType {
+		Anonymous,
+		HockeyAppEmail,
+		HockeyAppUser,
+		Validate
+	}
+
 	[Header("HockeyApp Setup")]
 	public string appID = "your-hockey-app-id";
 	public string packageID = "your-package-identifier";
 	public string serverURL = "your-custom-server-url";
+
+	[Header("Authentication")]
+	public AuthenticatorType authenticatorType;
+	public string secret = "your-hockey-app-secret";
 
 	[Header("Crashes & Exceptions")]
 	public bool autoUploadCrashes = false;
@@ -61,7 +72,7 @@ public class HockeyAppAndroid : MonoBehaviour {
 
 	void Awake(){
 
-		#if (UNITY_ANDROID && !UNITY_EDITOR)
+
 		DontDestroyOnLoad(gameObject);
 		if(exceptionLogging == true  && IsConnected() == true)
 		{
@@ -72,8 +83,9 @@ public class HockeyAppAndroid : MonoBehaviour {
 			}
 		}
 		string urlString = GetBaseURL();
-		StartCrashManager(urlString, appID, updateAlert, userMetrics, autoUploadCrashes);
-		#endif
+		int authType = (int)authenticatorType;
+		StartCrashManager(urlString, appID, secret, authType, updateAlert, userMetrics, autoUploadCrashes);
+
 	}
 	
 	void OnEnable(){
@@ -100,14 +112,20 @@ public class HockeyAppAndroid : MonoBehaviour {
 	/// <summary>
 	/// Start HockeyApp for Unity.
 	/// </summary>
-	/// <param name="appID">The app specific Identifier provided by HockeyApp</param>
-	protected void StartCrashManager(string urlString, string appID, bool updateManagerEnabled, bool userMetricsEnabled, bool autoSendEnabled) {
+	/// <param name="urlString">The url of the endpoint used for sending data.</param>
+	/// <param name="appID">The app specific Identifier provided by HockeyApp.</param>
+	/// <param name="secret">The app secret used for authenticating users.</param>
+	/// <param name="authType">Auth type used for authentication: Anonymous, email, email& password, or check if user was explicitly added to use this app.</param>
+	/// <param name="updateManagerEnabled">True, if user should be notified about newer versions of the app.</param>
+	/// <param name="userMetricsEnabled">True, app should send user and session information.</param>
+	/// <param name="autoSendEnabled">True, if crashes should be sent without asking the user for approval.</param>
+	protected void StartCrashManager(string urlString, string appID, string secret, int authType, bool updateManagerEnabled, bool userMetricsEnabled, bool autoSendEnabled) {
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
 		AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
 		AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		pluginClass.CallStatic("startHockeyAppManager", currentActivity, urlString, appID, updateManagerEnabled, userMetricsEnabled, autoSendEnabled);
+		pluginClass.CallStatic("startHockeyAppManager", currentActivity, urlString, appID, secret, authType, updateManagerEnabled, userMetricsEnabled, autoSendEnabled);
 		#endif
 	}
 
