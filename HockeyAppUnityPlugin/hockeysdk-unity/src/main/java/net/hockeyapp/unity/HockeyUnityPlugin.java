@@ -39,6 +39,7 @@ import net.hockeyapp.android.Constants;
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.CrashManagerListener;
 import net.hockeyapp.android.FeedbackManager;
+import net.hockeyapp.android.LoginManager;
 import net.hockeyapp.android.UpdateManager;
 import net.hockeyapp.android.metrics.MetricsManager;
 
@@ -51,19 +52,22 @@ public class HockeyUnityPlugin {
 	//region CONFIGURE AND START MODULES
 	//---------------------------------------------------------------------------------------
 	/**
-	 * Enables crash reporting, feedback, and app updates.
+	 * Enables crash reporting, feedback, user metrics, login, and app updates.
 	 * 
 	 * @param currentActivity			the context needed for starting this manager.
 	 * @param serverURL					the URL of the HockeyApp instance.
 	 * @param appID						the app identifier of your app.
+	 * @param secret					the app secret of your app used for authentication.
+	 * @param loginMode					the login mode used for authentication.
 	 * @param updateManagerEnabled		if true, the update manager is enabled.
+	 * @param userMetricsEnabled		if true, the metrics manager is enabled.
 	 * @param autoSendEnabled			if true, crashes will be sent without presenting a confirmation dialog.
 	 */
 	@Deprecated
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
 
 	public static void startHockeyAppManager(final Activity currentActivity, final String serverURL, 
-			final String appID, final boolean updateManagerEnabled, final boolean userMetricsEnabled, final boolean autoSendEnabled) {
+			final String appID, final String secret, final int loginMode, final boolean updateManagerEnabled, final boolean userMetricsEnabled, final boolean autoSendEnabled) {
 		currentActivity.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
@@ -75,6 +79,7 @@ public class HockeyUnityPlugin {
 				}
 				registerCrashManager(currentActivity, serverURL, appID, autoSendEnabled);
 				registerFeedbackManager(currentActivity, serverURL, appID);
+				registerLoginManager(currentActivity, serverURL, appID, secret, loginMode);
 			}
 		});
 	}
@@ -115,6 +120,27 @@ public class HockeyUnityPlugin {
 						return autoSendEnabled;
 					}
 				});
+			}
+		});
+	}
+
+	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
+	/**
+	 * Configures and starts the login module.
+	 *
+	 * @param currentActivity		the context needed for starting this manager.
+	 * @param serverURL				the URL of the HockeyApp instance.
+	 * @param appID					the app identifier of your app.
+	 * @param secret				the URL of the HockeyApp instance.
+	 * @param loginMode				the app identifier of your app.
+	 */
+	public static void registerLoginManager(final Activity currentActivity, final String serverURL, final String appID, final String secret, final int loginMode){
+
+		currentActivity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				LoginManager.register(currentActivity, appID, secret, serverURL, loginMode, currentActivity.getClass());
+				LoginManager.verifyLogin(currentActivity, currentActivity.getIntent());
 			}
 		});
 	}
