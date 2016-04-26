@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.hockeyapp.unity"
-    android:versionCode="8"
-    android:versionName="1.0.8" >
+    android:versionCode="9"
+    android:versionName="1.1.0-beta.1" >
     
     <uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <uses-sdk
-        android:minSdkVersion="8"
-        android:targetSdkVersion="18" />
+        android:minSdkVersion="9"
+        android:targetSdkVersion="23" />
 
     <application
         android:allowBackup="true"

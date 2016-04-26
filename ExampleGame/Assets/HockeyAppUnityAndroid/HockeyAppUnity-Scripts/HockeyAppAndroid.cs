@@ -2,11 +2,11 @@
  *
  * Author: Christoph Wendt
  * 
- * Version: 1.0.8
+ * Version: 1.1.0-beta.1
  *
- * Copyright (c) 2013-2015 HockeyApp, Bit Stadium GmbH.
+ * Copyright (c) HockeyApp, Bit Stadium GmbH.
  * All rights reserved.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -15,10 +15,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -41,17 +41,36 @@ public class HockeyAppAndroid : MonoBehaviour {
 	
 	protected const string HOCKEYAPP_BASEURL = "https://rink.hockeyapp.net/";
 	protected const string HOCKEYAPP_CRASHESPATH = "api/2/apps/[APPID]/crashes/upload";
-
 	protected const int MAX_CHARS = 199800;
 	protected const string LOG_FILE_DIR = "/logs/";
+
+	public enum AuthenticatorType {
+		Anonymous,
+		HockeyAppEmail,
+		HockeyAppUser,
+		Validate
+	}
+
+	[Header("HockeyApp Setup")]
 	public string appID = "your-hockey-app-id";
 	public string packageID = "your-package-identifier";
 	public string serverURL = "your-custom-server-url";
-	public bool autoUpload = false;
-	public bool exceptionLogging = false;
-	public bool updateManager = false;
 
-	void Awake(){
+	[Header("Authentication")]
+	public AuthenticatorType authenticatorType;
+	public string secret = "your-hockey-app-secret";
+
+	[Header("Crashes & Exceptions")]
+	public bool autoUploadCrashes = false;
+	public bool exceptionLogging = true;
+
+	[Header("Metrics")]
+	public bool userMetrics = true;
+
+	[Header("Version Updates")]
+	public bool updateAlert = true;
+
+	void Awake() {
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		DontDestroyOnLoad(gameObject);
@@ -64,25 +83,24 @@ public class HockeyAppAndroid : MonoBehaviour {
 			}
 		}
 		string urlString = GetBaseURL();
-		StartCrashManager(urlString, appID, updateManager, autoUpload);
+		int authType = (int)authenticatorType;
+		StartCrashManager(urlString, appID, secret, authType, updateAlert, userMetrics, autoUploadCrashes);
 		#endif
 	}
 	
-	void OnEnable(){
+	void OnEnable() {
 		
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		if(exceptionLogging == true)
-		{
+		if(exceptionLogging == true) {
 			System.AppDomain.CurrentDomain.UnhandledException += OnHandleUnresolvedException;
 			Application.logMessageReceived += OnHandleLogCallback;
 		}
 		#endif
 	}
 	
-	void OnDisable(){
+	void OnDisable() {
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		if(exceptionLogging == true)
-		{
+		if(exceptionLogging == true) {
 			System.AppDomain.CurrentDomain.UnhandledException -= OnHandleUnresolvedException;
 			Application.logMessageReceived -= OnHandleLogCallback;
 		}
@@ -92,14 +110,20 @@ public class HockeyAppAndroid : MonoBehaviour {
 	/// <summary>
 	/// Start HockeyApp for Unity.
 	/// </summary>
-	/// <param name="appID">The app specific Identifier provided by HockeyApp</param>
-	protected void StartCrashManager(string urlString, string appID, bool updateManagerEnabled, bool autoSendEnabled) {
+	/// <param name="urlString">The url of the endpoint used for sending data.</param>
+	/// <param name="appID">The app specific Identifier provided by HockeyApp.</param>
+	/// <param name="secret">The app secret used for authenticating users.</param>
+	/// <param name="authType">Auth type used for authentication: Anonymous, email, email& password, or check if user was explicitly added to use this app.</param>
+	/// <param name="updateManagerEnabled">True, if user should be notified about newer versions of the app.</param>
+	/// <param name="userMetricsEnabled">True, app should send user and session information.</param>
+	/// <param name="autoSendEnabled">True, if crashes should be sent without asking the user for approval.</param>
+	protected void StartCrashManager(string urlString, string appID, string secret, int authType, bool updateManagerEnabled, bool userMetricsEnabled, bool autoSendEnabled) {
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
 		AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
 		AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		pluginClass.CallStatic("startHockeyAppManager", currentActivity, urlString, appID, updateManagerEnabled, autoSendEnabled);
+		pluginClass.CallStatic("startHockeyAppManager", currentActivity, urlString, appID, secret, authType, updateManagerEnabled, userMetricsEnabled, autoSendEnabled);
 		#endif
 	}
 
@@ -107,7 +131,7 @@ public class HockeyAppAndroid : MonoBehaviour {
 	/// Get the version code of the app.
 	/// </summary>
 	/// <returns>The version code of the Android app.</returns>
-	protected String GetVersionCode(){
+	protected String GetVersionCode() {
 
 		string versionCode = null;
 
@@ -123,7 +147,7 @@ public class HockeyAppAndroid : MonoBehaviour {
 	/// Get the version name of the app.
 	/// </summary>
 	/// <returns>The version name of the Android app.</returns>
-	protected String GetVersionName(){
+	protected String GetVersionName() {
 		
 		string versionName = null;
 		
@@ -139,7 +163,7 @@ public class HockeyAppAndroid : MonoBehaviour {
 	/// Get the SDK version.
 	/// </summary>
 	/// <returns>The SDK version.</returns>
-	protected String GetSdkVersion(){
+	protected String GetSdkVersion() {
 		
 		string sdkVersion = null;
 		
@@ -155,7 +179,7 @@ public class HockeyAppAndroid : MonoBehaviour {
 	/// Get the name of the SDK.
 	/// </summary>
 	/// <returns>The name of the SDK.</returns>
-	protected String GetSdkName(){
+	protected String GetSdkName() {
 		
 		string sdkName = null;
 		
@@ -203,19 +227,18 @@ public class HockeyAppAndroid : MonoBehaviour {
 	/// </summary>
 	/// <param name="log">A string that contains information about the exception.</param>
 	/// <returns>The form data for the current crash report.</returns>
-	protected virtual WWWForm CreateForm(string log){
+	protected virtual WWWForm CreateForm(string log) {
 
 		WWWForm form = new WWWForm();
-		byte[] bytes = null;
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		byte[] bytes = null;
 		using(FileStream fs = File.OpenRead(log)){
 			
-			if (fs.Length > MAX_CHARS)
-			{
+			if (fs.Length > MAX_CHARS) {
 				string resizedLog = null;
 				
-				using(StreamReader reader = new StreamReader(fs)){
+				using(StreamReader reader = new StreamReader(fs)) {
 					
 					reader.BaseStream.Seek( fs.Length - MAX_CHARS, SeekOrigin.Begin );
 					resizedLog = reader.ReadToEnd();
@@ -224,43 +247,31 @@ public class HockeyAppAndroid : MonoBehaviour {
 				List<string> logHeaders = GetLogHeaders();
 				string logHeader = "";
 				
-				foreach (string header in logHeaders)
-				{
+				foreach (string header in logHeaders) {
 					logHeader += header + "\n";
 				}
 				
 				resizedLog = logHeader + "\n" + "[...]" + resizedLog;
 				
-				try
-				{
+				try {
 					bytes = System.Text.Encoding.Default.GetBytes(resizedLog);
-				}
-				catch(ArgumentException ae)
-				{
-					if (Debug.isDebugBuild) 
-					{
+				} catch(ArgumentException ae) {
+					if (Debug.isDebugBuild) {
 						Debug.Log("Failed to read bytes of log file: " + ae);
 					}
 				}
-			}
-			else
-			{
-				try
-				{
+			} else {
+				try {
 					bytes = File.ReadAllBytes(log);
-				}
-				catch(SystemException se)
-				{
-					if (Debug.isDebugBuild) 
-					{
+				} catch(SystemException se) {
+					if (Debug.isDebugBuild) {
 						Debug.Log("Failed to read bytes of log file: " + se);
 					}
 				}
 			}
 		}
 		
-		if(bytes != null)
-		{
+		if(bytes != null) {
 			form.AddBinaryData("log", bytes, log, "text/plain");
 		}
 		
@@ -280,35 +291,25 @@ public class HockeyAppAndroid : MonoBehaviour {
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		string logsDirectoryPath = Application.persistentDataPath + LOG_FILE_DIR;
 		
-		try
-		{
-			if (Directory.Exists(logsDirectoryPath) == false)
-			{
+		try {
+			if (Directory.Exists(logsDirectoryPath) == false) {
 				Directory.CreateDirectory(logsDirectoryPath);
 			}
 			
 			DirectoryInfo info = new DirectoryInfo(logsDirectoryPath);
 			FileInfo[] files = info.GetFiles();
 			
-			if (files.Length > 0)
-			{
-				foreach (FileInfo file in files)
-				{
-					if (file.Extension == ".log")
-					{
+			if (files.Length > 0) {
+				foreach (FileInfo file in files) {
+					if (file.Extension == ".log") {
 						logs.Add(file.FullName);
-					}
-					else
-					{
+					} else {
 						File.Delete(file.FullName);
 					}
 				}
 			}
-		}
-		catch(Exception e)
-		{
-			if (Debug.isDebugBuild) 
-			{
+		} catch(Exception e) {
+			if (Debug.isDebugBuild) {
 				Debug.Log("Failed to write exception log to file: " + e);
 			}
 		}
@@ -320,21 +321,19 @@ public class HockeyAppAndroid : MonoBehaviour {
 	/// <summary>
 	/// Upload existing reports to HockeyApp and delete delete them locally.
 	/// </summary>
-	protected virtual IEnumerator SendLogs(List<string> logs){
+	protected virtual IEnumerator SendLogs(List<string> logs) {
 
 		string crashPath = HOCKEYAPP_CRASHESPATH;
 		string url = GetBaseURL() + crashPath.Replace("[APPID]", appID);
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		string sdkVersion = GetSdkVersion ();
 		string sdkName = GetSdkName ();
-		if (sdkName != null && sdkVersion != null) {
-			url+= "?sdk=" + WWW.EscapeURL(sdkName) + "&sdk_version=" + sdkVersion;
+		if (sdkName != null) {
+			url+= "?sdk=" + WWW.EscapeURL(sdkName);
 		}
 		#endif
 
-		foreach (string log in logs)
-		{		
+		foreach (string log in logs) {		
 			WWWForm postForm = CreateForm(log);
 			string lContent = postForm.headers["Content-Type"].ToString();
 			lContent = lContent.Replace("\"", "");
@@ -343,14 +342,10 @@ public class HockeyAppAndroid : MonoBehaviour {
 			WWW www = new WWW(url, postForm.data, headers);
 			yield return www;
 
-			if (String.IsNullOrEmpty (www.error)) 
-			{
-				try 
-				{
+			if (String.IsNullOrEmpty (www.error)) {
+				try {
 					File.Delete (log);
-				} 
-				catch (Exception e) 
-				{
+				} catch (Exception e) {
 					if (Debug.isDebugBuild) Debug.Log ("Failed to delete exception log: " + e);
 				}
 			}
@@ -362,7 +357,7 @@ public class HockeyAppAndroid : MonoBehaviour {
 	/// </summary>
 	/// <param name="logString">A string that contains the reason for the exception.</param>
 	/// <param name="stackTrace">The stacktrace for the exception.</param>
-	protected virtual void WriteLogToDisk(string logString, string stackTrace){
+	protected virtual void WriteLogToDisk(string logString, string stackTrace) {
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		string logSession = DateTime.Now.ToString("yyyy-MM-dd-HH_mm_ss_fff");
@@ -370,19 +365,15 @@ public class HockeyAppAndroid : MonoBehaviour {
 		string[]stacktraceLines = stackTrace.Split('\n');
 		
 		log = "\n" + log + "\n";
-		foreach (string line in stacktraceLines)
-		{
-			if(line.Length > 0)
-			{
+		foreach (string line in stacktraceLines) {
+			if(line.Length > 0) {
 				log +="  at " + line + "\n";
 			}
 		}
 		
 		List<string> logHeaders = GetLogHeaders();
-		using (StreamWriter file = new StreamWriter(Application.persistentDataPath + LOG_FILE_DIR + "LogFile_" + logSession + ".log", true))
-		{
-			foreach (string header in logHeaders)
-			{
+		using (StreamWriter file = new StreamWriter(Application.persistentDataPath + LOG_FILE_DIR + "LogFile_" + logSession + ".log", true)) {
+			foreach (string header in logHeaders) {
 				file.WriteLine(header);
 			}
 			file.WriteLine(log);
@@ -401,16 +392,13 @@ public class HockeyAppAndroid : MonoBehaviour {
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 
 		string urlString = serverURL.Trim();
-		if(urlString.Length > 0)
-		{
+		if(urlString.Length > 0) {
 			baseURL = urlString;
 			
-			if(baseURL[baseURL.Length -1].Equals("/") != true){
+			if(baseURL[baseURL.Length -1].Equals("/") != true) {
 				baseURL += "/";
 			}
-		}
-		else
-		{
+		} else {
 			baseURL = HOCKEYAPP_BASEURL;
 		}
 		#endif
@@ -421,18 +409,15 @@ public class HockeyAppAndroid : MonoBehaviour {
 	/// <summary>
 	/// Checks whether internet is reachable
 	/// </summary>
-	protected virtual bool IsConnected()
-	{
+	protected virtual bool IsConnected() {
 		
 		bool connected = false;
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		
 		if  (Application.internetReachability == NetworkReachability.ReachableViaLocalAreaNetwork || 
-		     (Application.internetReachability == NetworkReachability.ReachableViaCarrierDataNetwork))
-		{
+		     (Application.internetReachability == NetworkReachability.ReachableViaCarrierDataNetwork)) {
 			connected = true;
 		}
-		
 		#endif
 		
 		return connected;
@@ -443,7 +428,7 @@ public class HockeyAppAndroid : MonoBehaviour {
 	/// </summary>
 	/// <param name="logString">A string that contains the reason for the exception.</param>
 	/// <param name="stackTrace">The stacktrace for the exception.</param>
-	protected virtual void HandleException(string logString, string stackTrace){
+	protected virtual void HandleException(string logString, string stackTrace) {
 		
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		WriteLogToDisk(logString, stackTrace);
@@ -459,23 +444,20 @@ public class HockeyAppAndroid : MonoBehaviour {
 	public void OnHandleLogCallback(string logString, string stackTrace, LogType type){
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		if(LogType.Assert == type || LogType.Exception == type || LogType.Error == type)	
-		{	
+		if(LogType.Assert == type || LogType.Exception == type || LogType.Error == type) {	
 			HandleException(logString, stackTrace);
 		}	
 		#endif
 	}
 	
-	public void OnHandleUnresolvedException(object sender, System.UnhandledExceptionEventArgs args){
+	public void OnHandleUnresolvedException(object sender, System.UnhandledExceptionEventArgs args) {
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		if(args == null || args.ExceptionObject == null)
-		{	
+		if(args == null || args.ExceptionObject == null) {	
 			return;	
 		}
 
-		if(args.ExceptionObject.GetType() == typeof(System.Exception))
-		{	
+		if(args.ExceptionObject.GetType() == typeof(System.Exception)) {	
 			System.Exception e	= (System.Exception)args.ExceptionObject;
 			HandleException(e.Source, e.StackTrace);
 		}
