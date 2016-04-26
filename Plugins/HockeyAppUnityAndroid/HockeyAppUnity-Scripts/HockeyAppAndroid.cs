@@ -44,6 +44,7 @@ public class HockeyAppAndroid : MonoBehaviour {
 		DontDestroyOnLoad(gameObject);
 		if(exceptionLogging == true  && IsConnected() == true)
 		{
+		CreateLogDirectory();
 			List<string> logFileDirs = GetLogFiles();
 			if(logFileDirs.Count > 0)
 			{
@@ -249,6 +250,22 @@ public class HockeyAppAndroid : MonoBehaviour {
 	}
 
 	/// <summary>
+	/// Create the log directory if needed.
+	/// </summary>
+	protected virtual void CreateLogDirectory ()
+	{
+		#if (UNITY_IPHONE && !UNITY_EDITOR)
+		string logsDirectoryPath = Application.persistentDataPath + LOG_FILE_DIR;
+		
+		try {
+			Directory.CreateDirectory (logsDirectoryPath);
+		} catch (Exception e) {
+			if (Debug.isDebugBuild) Debug.Log ("Failed to create log directory at " + logsDirectoryPath + ": " + e);
+		}
+		#endif
+	}
+
+	/// <summary>
 	/// Get a list of all existing exception reports.
 	/// </summary>
 	/// <returns>A list which contains the filenames of the log files.</returns>
@@ -260,10 +277,6 @@ public class HockeyAppAndroid : MonoBehaviour {
 		string logsDirectoryPath = Application.persistentDataPath + LOG_FILE_DIR;
 		
 		try {
-			if (Directory.Exists(logsDirectoryPath) == false) {
-				Directory.CreateDirectory(logsDirectoryPath);
-			}
-			
 			DirectoryInfo info = new DirectoryInfo(logsDirectoryPath);
 			FileInfo[] files = info.GetFiles();
 			
