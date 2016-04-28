@@ -1,10 +1,11 @@
 ###Changelog:###
 
-### 1.1.0-beta.1:
-
+### 1.1.0
 * [NEW] User Metrics (user and session tracking)
+* [NEW] Trigger version update check explicitly
 * [NEW] Authentication
-* [UPDATE] Plugin now uses HockeySDK Android 4.0.0-beta.1
+* [BUGFIX] Avoid app crash when first launching app without internet connection
+* [UPDATE] Plugin now uses HockeySDK Android 4.0.0
 * [UPDATE] Minor bugfixes
 
 ### 1.0.8:
