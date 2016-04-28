@@ -12,6 +12,7 @@ public class HockeyAppAndroid : MonoBehaviour
 	protected const string HOCKEYAPP_CRASHESPATH = "api/2/apps/[APPID]/crashes/upload";
 	protected const int MAX_CHARS = 199800;
 	protected const string LOG_FILE_DIR = "/logs/";
+	private static HockeyAppAndroid instance;
 
 	public enum AuthenticatorType
 	{
@@ -44,6 +45,10 @@ public class HockeyAppAndroid : MonoBehaviour
 	{
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		if (instance != null) {
+			return;
+		}
+
 		DontDestroyOnLoad(gameObject);
 		CreateLogDirectory();
 
@@ -53,9 +58,9 @@ public class HockeyAppAndroid : MonoBehaviour
 				StartCoroutine(SendLogs(logFileDirs));
 			}
 		}
-		string urlString = GetBaseURL();
+		serverURL = GetBaseURL();
 		int authType = (int)authenticatorType;
-		StartCrashManager(urlString, appID, secret, authType, updateAlert, userMetrics, autoUploadCrashes);
+		StartCrashManager(serverURL, appID, secret, authType, updateAlert, userMetrics, autoUploadCrashes);
 		#endif
 	}
 	
@@ -97,6 +102,42 @@ public class HockeyAppAndroid : MonoBehaviour
 		AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
 		AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
 		pluginClass.CallStatic("startHockeyAppManager", currentActivity, urlString, appID, secret, authType, updateManagerEnabled, userMetricsEnabled, autoSendEnabled);
+		instance = this;
+		#endif
+
+	}
+
+	/// <summary>
+	/// Check for version update and present alert if newer version is available.
+	/// </summary>
+	public static void CheckForUpdate()
+	{	
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		if (instance != null) {
+			AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
+			AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
+			AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
+			pluginClass.CallStatic("checkForUpdate", currentActivity, instance.serverURL, instance.appID);
+		} else {
+			Debug.Log("Failed to check for update. SDK has not been initialized, yet.");
+		}
+		#endif
+	}
+
+	/// <summary>
+	/// Display a feedback form.
+	/// </summary>
+	public static void ShowFeedbackForm()
+	{	
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		if (instance != null) {
+			AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
+			AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
+			AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
+			pluginClass.CallStatic("startFeedbackForm", currentActivity);
+		} else {
+			Debug.Log("Failed to present feedback form. SDK has not been initialized, yet.");
+		}
 		#endif
 	}
 
@@ -257,7 +298,7 @@ public class HockeyAppAndroid : MonoBehaviour
 	/// </summary>
 	protected virtual void CreateLogDirectory ()
 	{
-		#if (UNITY_IPHONE && !UNITY_EDITOR)
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		string logsDirectoryPath = Application.persistentDataPath + LOG_FILE_DIR;
 		
 		try {

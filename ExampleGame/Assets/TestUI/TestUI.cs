@@ -76,6 +76,11 @@ public class TestUI : MonoBehaviour{
 		{	
 			ShowFeedbackForm();
 		}
+
+		if(GUI.Button(GetControlRect(12), "Check For Update"))
+		{	
+			CheckForUpdate();
+		}
 	}
 
 	private Rect GetControlRect(int controlIndex){
@@ -122,10 +127,14 @@ public class TestUI : MonoBehaviour{
 	public void ShowFeedbackForm(){
 		
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
-		AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
-		AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		pluginClass.CallStatic("startFeedbackForm", currentActivity);
+		HockeyAppAndroid.ShowFeedbackForm();
+		#endif
+	}
+
+	public void CheckForUpdate(){
+		
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		HockeyAppAndroid.CheckForUpdate();
 		#endif
 	}
 }
