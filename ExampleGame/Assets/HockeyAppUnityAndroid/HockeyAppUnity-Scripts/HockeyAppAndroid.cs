@@ -298,7 +298,7 @@ public class HockeyAppAndroid : MonoBehaviour
 	/// </summary>
 	protected virtual void CreateLogDirectory ()
 	{
-		#if (UNITY_IPHONE && !UNITY_EDITOR)
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		string logsDirectoryPath = Application.persistentDataPath + LOG_FILE_DIR;
 		
 		try {
