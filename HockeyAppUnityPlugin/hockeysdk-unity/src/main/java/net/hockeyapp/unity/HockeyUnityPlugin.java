@@ -169,8 +169,7 @@ public class HockeyUnityPlugin {
 	
 	//region METADATA
 	//---------------------------------------------------------------------------------------
-	
-	
+
 	/**
 	 * @return the version of your app.
 	 */
@@ -195,25 +194,6 @@ public class HockeyUnityPlugin {
 
 	//region FEEDBACK MANAGER
 	//---------------------------------------------------------------------------------------
-	@Deprecated
-	/**
-	 * Shows a feedback form. This should be called after {@link HockeyUnityPlugin#registerFeedbackManager(Activity, String, String)}.
-	 * 
-	 * @param currentActivity	the context needed for starting this manager.
-	 * @param serverURL			the URL of the HockeyApp instance.
-	 * @param appID				the app identifier of your app.
-	 */
-	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
-	public static void startFeedbackForm(final String appID,
-			final Activity currentActivity) {
-
-		currentActivity.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				FeedbackManager.showFeedbackActivity(currentActivity);
-			}
-		});
-	}
 
 	/**
 	 * Shows a feedback form. This should be called after {@link HockeyUnityPlugin#registerFeedbackManager(Activity, String, String)}.
@@ -229,6 +209,24 @@ public class HockeyUnityPlugin {
 				FeedbackManager.showFeedbackActivity(currentActivity);
 			}
 		});
+	}
+	//---------------------------------------------------------------------------------------
+	//endregion
+
+	//region UPDATE MANAGER
+	//---------------------------------------------------------------------------------------
+
+	/**
+	 *  Checks for version update and presents update alert if newer version is available.
+	 *
+	 * @param currentActivity	the context needed to show update alert.
+	 * @param serverURL			the URL of the HockeyApp instance.
+	 * @param appID				the app identifier of your app.
+	 */
+	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
+	public static void checkForUpdate(final Activity currentActivity, final String serverURL, final String appID) {
+		UpdateManager.unregister();
+		registerUpdateManager(currentActivity, serverURL, appID);
 	}
 	//---------------------------------------------------------------------------------------
 	//endregion
