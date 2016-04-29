@@ -1,4 +1,4 @@
-## Version 1.1.0-beta.1
+## Version 1.1.0
 =======
 
 ## Introduction
@@ -98,19 +98,15 @@ The **Development Build** option affects the exception handling in C#. You will 
 
 ### Feedback Form
 
-The HockeyApp feedback form can be presented as follows:
+In order to provide your users with a feedback form, just call the following static method: 
+	
+	HockeyAppAndroid.ShowFeedbackForm(); 
+	
+### Explicitly check for updates
 
-```	java
-// Get the current activity object
-AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
-AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
+Usually, the update check happens everytime the app enters the foreground. If you'd like to explicitly trigger this check, please add the following to your code: 
 	
-// Get the plugin
-AndroidJavaClass plugin = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-	
-// Show the feedback form
-plugin.CallStatic("startFeedbackForm", <YOUR-HOCKEY-APP-ID> , currentActivity);
-```
+	HockeyAppAndroid.CheckForUpdate(); 
 
 ## <a name="4"></a>Troubleshooting
 
