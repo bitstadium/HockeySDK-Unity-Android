@@ -1,38 +1,3 @@
-/**
- * <h3>License</h3>
- *
- * <pre>
- *
- * Version 1.1.0-beta.1
- *
- * Copyright (c) HockeyApp, Bit Stadium GmbH.
- * All rights reserved.
- *
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use,
- * copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following
- * conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
- * OTHER DEALINGS IN THE SOFTWARE.
- * </pre>
- *
- * @author Christoph Wendt
- **/
-
 package net.hockeyapp.unity;
 
 import net.hockeyapp.android.Constants;
@@ -204,8 +169,7 @@ public class HockeyUnityPlugin {
 	
 	//region METADATA
 	//---------------------------------------------------------------------------------------
-	
-	
+
 	/**
 	 * @return the version of your app.
 	 */
@@ -230,25 +194,6 @@ public class HockeyUnityPlugin {
 
 	//region FEEDBACK MANAGER
 	//---------------------------------------------------------------------------------------
-	@Deprecated
-	/**
-	 * Shows a feedback form. This should be called after {@link HockeyUnityPlugin#registerFeedbackManager(Activity, String, String)}.
-	 * 
-	 * @param currentActivity	the context needed for starting this manager.
-	 * @param serverURL			the URL of the HockeyApp instance.
-	 * @param appID				the app identifier of your app.
-	 */
-	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
-	public static void startFeedbackForm(final String appID,
-			final Activity currentActivity) {
-
-		currentActivity.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				FeedbackManager.showFeedbackActivity(currentActivity);
-			}
-		});
-	}
 
 	/**
 	 * Shows a feedback form. This should be called after {@link HockeyUnityPlugin#registerFeedbackManager(Activity, String, String)}.
@@ -264,6 +209,24 @@ public class HockeyUnityPlugin {
 				FeedbackManager.showFeedbackActivity(currentActivity);
 			}
 		});
+	}
+	//---------------------------------------------------------------------------------------
+	//endregion
+
+	//region UPDATE MANAGER
+	//---------------------------------------------------------------------------------------
+
+	/**
+	 *  Checks for version update and presents update alert if newer version is available.
+	 *
+	 * @param currentActivity	the context needed to show update alert.
+	 * @param serverURL			the URL of the HockeyApp instance.
+	 * @param appID				the app identifier of your app.
+	 */
+	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
+	public static void checkForUpdate(final Activity currentActivity, final String serverURL, final String appID) {
+		UpdateManager.unregister();
+		registerUpdateManager(currentActivity, serverURL, appID);
 	}
 	//---------------------------------------------------------------------------------------
 	//endregion
