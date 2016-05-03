@@ -39,8 +39,10 @@ This document contains the following sections:
 The following steps illustrate how to integrate the HockeyAppUnity-Android plugin:
 
 ### 1) Import plugin
-Copy the **HockeyAppUnityAndroid** folder into the **Assets** directory of your Unity project
-Unity
+You can either import the plugin [from the Asset Store](https://www.assetstore.unity3d.com/en/#!/content/17759) or download the *.unitypackage* from our [GitHub releases page](https://github.com/bitstadium/HockeySDK-Unity-Android/releases) and install it by doubleclicking the file. That's it!
+
+**Note:** In case you've cloned the repo, simply copy the **HockeyAppUnityAndroid** folder into the **Assets** directory of your Unity project.
+
 ![alt text](Documentation/01_add_plugin.png  "Add HockeyAppUnityAndroid folders")
 
 ### 2) Modify AndroidManifest.xml
