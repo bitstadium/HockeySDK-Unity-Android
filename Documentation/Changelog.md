@@ -1,5 +1,9 @@
 ###Changelog:###
 
+### 1.1.1
+* [BUGFIX] Fix bug where report for managed exceptions didn't contain a `CrashReporter Key`. The key is needed to get proper user statistics on the portal
+* [UPDATE] Plugin now uses HockeySDK Android 4.0.1
+
 ### 1.1.0
 * [NEW] User Metrics (user and session tracking)
 * [NEW] Trigger version update check explicitly
