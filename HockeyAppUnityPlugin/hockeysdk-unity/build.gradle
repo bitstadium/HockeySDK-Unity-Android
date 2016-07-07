@@ -5,8 +5,8 @@ android {
     buildToolsVersion "23.0.3"
 
     defaultConfig {
-        minSdkVersion 8
-        targetSdkVersion 18
+        minSdkVersion 9
+        targetSdkVersion 23
     }
 
     buildTypes {
@@ -25,5 +25,5 @@ repositories {
 }
 
 dependencies {
-    compile(name:'HockeySDK-4.0.0', ext:'aar')
+    compile(name:'HockeySDK-4.0.1', ext:'aar')
 }
