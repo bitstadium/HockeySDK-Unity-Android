@@ -205,6 +205,53 @@ public class HockeyAppAndroid : MonoBehaviour
 		return sdkName;
 	}
 
+	/// <summary>
+	/// The device's model manufacturer name.
+	/// </summary>
+	/// <returns>The device's model manufacturer name.</returns>
+	protected String GetManufacturer ()
+	{
+		string manufacturer = null;
+
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
+		manufacturer =  jc.CallStatic<string>("getManufacturer");
+		#endif
+
+		return manufacturer;
+	}
+
+	/// <summary>
+	/// The device's model name.
+	/// </summary>
+	/// <returns>The device's model name.</returns>
+	protected String GetModel ()
+	{
+		string model = null;
+
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
+		model =  jc.CallStatic<string>("getModel");
+		#endif
+
+		return model;
+	}
+
+	/// <summary>
+	/// The device's model manufacturer name.
+	/// </summary>
+	/// <returns>The device's model manufacturer name.</returns>
+	protected String GetCrashReporterKey ()
+	{
+		string crashReporterKey = null;
+
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
+		crashReporterKey =  jc.CallStatic<string>("getCrashReporterKey");
+		#endif
+
+		return crashReporterKey;
+	}
 
 	/// <summary>
 	/// Collect all header fields for the custom exception report.
@@ -227,8 +274,15 @@ public class HockeyAppAndroid : MonoBehaviour
 		string[] versionComponents = SystemInfo.operatingSystem.Split('/');
 		string osVersion = "Android: " + versionComponents[0].Replace("Android OS ", "");
 		list.Add (osVersion);
-		
-		list.Add("Model: " + SystemInfo.deviceModel);
+
+		string manufacturer = GetManufacturer();
+		list.Add("Manufacturer: " + manufacturer);
+
+		string model = GetModel();
+		list.Add("Model: " + model);
+
+		string crashReporterKey = GetCrashReporterKey();
+		list.Add("CrashReporter Key: " + crashReporterKey);
 
 		list.Add("Date: " + DateTime.UtcNow.ToString("ddd MMM dd HH:mm:ss {}zzzz yyyy").Replace("{}", "GMT"));
 		#endif
