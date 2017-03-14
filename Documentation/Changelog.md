@@ -1,5 +1,12 @@
 ###Changelog:###
 
+### 1.1.3
+* [IMPROVEMENT] Update to HockeySDK Android version 4.1.3
+* [FIX] Thanks to Ivan Matkov, it's no longer possible to avoid providing login information and circumvent authentication. [#208](https://github.com/bitstadium/HockeySDK-Android/pull/208)
+* [FIX] Thanks to Guillaume Perrot, the google play store detection was fixed for emulators running Android Nougat. [#209](https://github.com/bitstadium/HockeySDK-Android/pull/209)
+* [IMPROVEMENT] It's now possible to scroll within the `FeedbackActivity` while the keyboard is up. Previously, when providing a lot of feedback, the keyboard could hide the submit-button. [#207](https://github.com/bitstadium/HockeySDK-Android/pull/207)
+* [IMPROVEMENT] In case the app is offline, the Update feature will no longer log the IOException to avoid confusion. [#209](https://github.com/bitstadium/HockeySDK-Android/pull/209)
+
 ### 1.1.2
 * [BUGFIX] Installing an app through HockeyApp would falsely report this as a store installation on Android Nougat
 * [BUGFIX] Workaround an issue when installing updates and targeting SDK version 24
