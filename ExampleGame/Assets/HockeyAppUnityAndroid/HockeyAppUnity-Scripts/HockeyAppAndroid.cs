@@ -1,4 +1,8 @@
-﻿using UnityEngine;
+﻿/*
+ * Version: 1.1.3
+ */
+
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
