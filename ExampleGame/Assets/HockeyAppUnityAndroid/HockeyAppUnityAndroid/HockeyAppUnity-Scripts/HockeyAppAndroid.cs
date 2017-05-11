@@ -1,5 +1,5 @@
 ﻿/*
- * Version: 1.1.3
+ * Version: 1.1.4
  */
 
 using UnityEngine;
@@ -50,6 +50,7 @@ public class HockeyAppAndroid : MonoBehaviour
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		if (instance != null) {
+			Destroy(gameObject);
 			return;
 		}
 
