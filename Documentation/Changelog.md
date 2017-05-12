@@ -1,5 +1,12 @@
 ###Changelog:###
 
+### 1.1.4
+Upgrade to HockeySDK for Android 4.1.4
+
+* [IMPROVEMENT] Minor bugfixes
+* [IMPROVEMENT] FeedbackActivity now uses accessibility labels.
+
+
 ### 1.1.3
 * [IMPROVEMENT] Update to HockeySDK Android version 4.1.3
 * [FIX] Thanks to Ivan Matkov, it's no longer possible to avoid providing login information and circumvent authentication. [#208](https://github.com/bitstadium/HockeySDK-Android/pull/208)

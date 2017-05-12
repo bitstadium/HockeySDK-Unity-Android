@@ -28,7 +28,6 @@ public class HockeyUnityPlugin {
 	 * @param userMetricsEnabled		if true, the metrics manager is enabled.
 	 * @param autoSendEnabled			if true, crashes will be sent without presenting a confirmation dialog.
 	 */
-	@Deprecated
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
 
 	public static void startHockeyAppManager(final Activity currentActivity, final String serverURL, 
