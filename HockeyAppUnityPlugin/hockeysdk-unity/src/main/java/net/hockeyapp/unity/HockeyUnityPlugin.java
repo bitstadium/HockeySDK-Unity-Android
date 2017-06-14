@@ -12,6 +12,8 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
 
+import java.lang.reflect.Method;
+
 public class HockeyUnityPlugin {
 
 	//region CONFIGURE AND START MODULES
@@ -138,6 +140,18 @@ public class HockeyUnityPlugin {
 			@Override
 			public void run() {
                 MetricsManager.register(currentActivity, currentActivity.getApplication(), appID);
+
+				// Unity's awake calls after android activity shown.
+				// We force start session to avoid missing it.
+				try {
+					Method getInstance = MetricsManager.class.getDeclaredMethod("getInstance");
+					getInstance.setAccessible(true);
+					MetricsManager instance = (MetricsManager) getInstance.invoke(null);
+					Method updateSession = MetricsManager.class.getDeclaredMethod("updateSession");
+					updateSession.setAccessible(true);
+					updateSession.invoke(instance);
+				} catch (Throwable ignored) {
+				}
             }
         });
 	}
