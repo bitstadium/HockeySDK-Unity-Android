@@ -1,4 +1,4 @@
-## Version 1.1.4
+## Version 1.1.5
 
 ## Introduction
 
@@ -28,7 +28,7 @@ This document contains the following sections:
 6. [Contributor License](#6)
 7. [Licenses](#7)
 
-## <a name="1"></a>Requirements (Version 1.1.4)
+## <a name="1"></a>Requirements (Version 1.1.5)
 
 * [Changelog](Documentation/Changelog.md)
 * Unity 5.0 or newer (SDK versions with Unity 4 support can be found at the [Unity Asset Store](https://www.assetstore.unity3d.com/en/?gclid=CO) or by switching to the 1.0.3 tag on GitHub).
