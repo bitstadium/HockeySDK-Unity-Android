@@ -1,5 +1,9 @@
 ###Changelog:###
 
+### 1.1.5
+
+* [FIX] Fixes session tracking by explicitly starting one.
+
 ### 1.1.4
 Upgrade to HockeySDK for Android 4.1.4
 
