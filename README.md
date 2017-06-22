@@ -8,7 +8,7 @@ The following features are currently supported:
 
 1. **Collect crash reports:** If your app crashes, a crash log is written to the device's storage. If the user starts the app again, they will be asked asked to submit the crash report to HockeyApp. This works for both beta and live apps, i.e. those submitted to Google Play or other app stores. Crash logs contain viable information for you to help resolve the issue.
 
-2. **Collect exceptions** The HockeySDK-Unity-Android can automatically report uncaught managed exceptions comming from your C# code. Just like crashes, those exceptions will be sent on the next app start and are displayed on HockeyApp.
+2. **Collect exceptions** The HockeySDK-Unity-Android can automatically report uncaught managed exceptions coming from your C# code. Just like crashes, those exceptions will be sent on the next app start and are displayed on HockeyApp.
 
 2. **User metrics:** Understand user behavior to improve your app. Track usage through daily and monthly active users. Monitor crash impacted users. Measure customer engagement through session count. This feature requires a minimum API level of 14 (Android 4.x Ice Cream Sandwich).
 
@@ -39,7 +39,7 @@ This document contains the following sections:
 The following steps illustrate how to integrate the HockeyAppUnity-Android plugin:
 
 ### 1) Import plugin
-You can either import the plugin [from the Asset Store](https://www.assetstore.unity3d.com/en/#!/content/17759) or download the *.unitypackage* from our [GitHub releases page](https://github.com/bitstadium/HockeySDK-Unity-Android/releases) and install it by doubleclicking the file. That's it!
+You can either import the plugin [from the Asset Store](https://www.assetstore.unity3d.com/en/#!/content/17759) or download the *.unitypackage* from our [GitHub releases page](https://github.com/bitstadium/HockeySDK-Unity-Android/releases) and install it by double-clicking the file. That's it!
 
 **Note:** In case you've cloned the repo, simply copy the **HockeyAppUnityAndroid** folder into the **Assets** directory of your Unity project.
 
