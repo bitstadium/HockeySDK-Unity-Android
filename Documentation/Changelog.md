@@ -1,5 +1,21 @@
 ###Changelog:###
 
+### 1.1.6
+
+Upgrade to HockeySDK for Android 4.1.5
+
+* [FIX] Fix a resource leak in Sender.
+* [FIX] Fix possibility to bypass authentication.
+* [FIX] Fix the progressbar when sending feedback.
+* [FIX] Fix the dates in the Feedback UI.
+* [FIX] Fix ConcurrentModificationException in metrics feature.
+* [FIX] Fix potential crash related to multi-threading in Channel.
+* [FIX] Fix the focus in the Feedback UI, this also improves accessibility.
+* [IMPROVEMENT] Fix some strict mode violations.
+* [IMPROVEMENT] Improve accessibility for Feedback attachments.
+* [IMPROVEMENT] Send batched events when the app goes into background.
+* [IMPROVEMENT] Automatically add the sdk to the often already existent Plugins folder 
+
 ### 1.1.5
 
 * [FIX] Fixes session tracking by explicitly starting one.
