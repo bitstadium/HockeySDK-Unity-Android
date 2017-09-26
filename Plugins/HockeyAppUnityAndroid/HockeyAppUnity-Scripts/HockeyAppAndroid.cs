@@ -16,6 +16,7 @@ public class HockeyAppAndroid : MonoBehaviour
 	protected const string HOCKEYAPP_CRASHESPATH = "api/2/apps/[APPID]/crashes/upload";
 	protected const int MAX_CHARS = 199800;
 	protected const string LOG_FILE_DIR = "/logs/";
+	private const string SERVER_URL_PLACEHOLDER = "your-custom-server-url"; 
 	private static HockeyAppAndroid instance;
 
 	public enum AuthenticatorType
@@ -29,7 +30,7 @@ public class HockeyAppAndroid : MonoBehaviour
 	[Header("HockeyApp Setup")]
 	public string appID = "your-hockey-app-id";
 	public string packageID = "your-package-identifier";
-	public string serverURL = "your-custom-server-url";
+	public string serverURL = SERVER_URL_PLACEHOLDER;
 
 	[Header("Authentication")]
 	public AuthenticatorType authenticatorType;
@@ -477,7 +478,7 @@ public class HockeyAppAndroid : MonoBehaviour
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 
 		string urlString = serverURL.Trim();
-		if(urlString.Length > 0) {
+		if(urlString.Length > 0 && urlString != SERVER_URL_PLACEHOLDER) {
 			baseURL = urlString;
 			
 			if(baseURL[baseURL.Length -1].Equals("/") != true) {
