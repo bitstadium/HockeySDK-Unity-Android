@@ -203,11 +203,6 @@ public class HockeyUnityPlugin {
 	public static String getSdkName() {return Constants.SDK_NAME; }
 
 	/**
-	 * @return unique identifier for crash reports.
-	 */
-	public static String getCrashReporterKey() {return Constants.CRASH_IDENTIFIER; }
-
-	/**
 	 * @return the device's model manufacturer name.
 	 */
 	public static String getManufacturer() {return Constants.PHONE_MANUFACTURER; }
