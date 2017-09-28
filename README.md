@@ -1,4 +1,4 @@
-## Version 1.1.6
+# Version 5.0.0
 
 ## Introduction
 
@@ -10,7 +10,7 @@ The following features are currently supported:
 
 2. **Collect exceptions** The HockeySDK-Unity-Android can automatically report uncaught managed exceptions coming from your C# code. Just like crashes, those exceptions will be sent on the next app start and are displayed on HockeyApp.
 
-2. **User metrics:** Understand user behavior to improve your app. Track usage through daily and monthly active users. Monitor crash impacted users. Measure customer engagement through session count. This feature requires a minimum API level of 14 (Android 4.x Ice Cream Sandwich).
+2. **User metrics:** Understand user behavior to improve your app. Track usage through daily and monthly active users. Monitor crash impacted users. Measure customer engagement through session count.
 
 3. **Update alpha/beta apps:** The app will check with HockeyApp if a new version for your alpha/beta build is available. If yes, it will show a dialog to users and let them see the release notes, the version history and start the installation process right away. You can even force the installation of certain updates.
 
@@ -20,7 +20,7 @@ The following features are currently supported:
 
 This document contains the following sections:
 
-1. [Requirements (Version 1.1.6)](#1)
+1. [Requirements](#1)
 2. [Installation & Setup](#2)
 3. [Examples](#3)
 4. [Troubleshooting](#4)
@@ -28,11 +28,11 @@ This document contains the following sections:
 6. [Contributor License](#6)
 7. [Licenses](#7)
 
-## <a name="1"></a>Requirements (Version 1.1.6)
+## <a name="1"></a>Requirements
 
 * [Changelog](Documentation/Changelog.md)
 * Unity 5.0 or newer (SDK versions with Unity 4 support can be found at the [Unity Asset Store](https://www.assetstore.unity3d.com/en/?gclid=CO) or by switching to the 1.0.3 tag on GitHub).
-* Android 2.3 or newer.
+* Android API level 15 or later.
 
 ## <a name="2"></a>Installation & Setup
 
