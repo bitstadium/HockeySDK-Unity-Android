@@ -2,10 +2,10 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.0"
+    buildToolsVersion "26.0.1"
 
     defaultConfig {
-        minSdkVersion 9
+        minSdkVersion 15
         targetSdkVersion 26
     }
 
@@ -25,5 +25,5 @@ repositories {
 }
 
 dependencies {
-    compile(name:'HockeySDK-4.1.5', ext:'aar')
+    compile(name:'HockeySDK-5.0.2', ext:'aar')
 }
