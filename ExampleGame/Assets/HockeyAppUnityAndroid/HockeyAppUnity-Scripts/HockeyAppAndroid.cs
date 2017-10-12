@@ -92,11 +92,11 @@ public class HockeyAppAndroid : MonoBehaviour
 	}
 
 	void OnApplicationPause(bool pause)
-    {
-        if (!pause) {
+	{
+		if (!pause) {
 			PerformAuthentication();
 		}
-    }
+	}
 
 	/// <summary>
 	/// Start HockeyApp for Unity.
