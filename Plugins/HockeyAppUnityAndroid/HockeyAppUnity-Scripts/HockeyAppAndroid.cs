@@ -91,6 +91,13 @@ public class HockeyAppAndroid : MonoBehaviour
 		#endif
 	}
 
+	void OnApplicationPause(bool pause)
+    {
+        if (!pause) {
+			PerformAuthentication();
+		}
+    }
+
 	/// <summary>
 	/// Start HockeyApp for Unity.
 	/// </summary>
@@ -111,6 +118,19 @@ public class HockeyAppAndroid : MonoBehaviour
 		instance = this;
 		#endif
 
+	}
+
+	/// <summary>
+	/// Performs user authentication.
+	/// </summary>
+	public static void PerformAuthentication()
+	{	
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
+		AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
+		AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
+		pluginClass.CallStatic("performAuthentication", currentActivity);
+		#endif
 	}
 
 	/// <summary>
