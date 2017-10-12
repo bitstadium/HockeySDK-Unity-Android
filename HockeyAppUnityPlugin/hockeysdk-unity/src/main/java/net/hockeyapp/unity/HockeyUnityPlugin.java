@@ -92,7 +92,7 @@ public class HockeyUnityPlugin {
 
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
 	/**
-	 * Configures and starts the login module.
+	 * Configures the login module.
 	 *
 	 * @param currentActivity		the context needed for starting this manager.
 	 * @param serverURL				the URL of the HockeyApp instance.
@@ -106,6 +106,21 @@ public class HockeyUnityPlugin {
 			@Override
 			public void run() {
 				LoginManager.register(currentActivity, appID, secret, serverURL, loginMode, currentActivity.getClass());
+			}
+		});
+	}
+
+	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
+	/**
+	 * Starts the login module.
+	 *
+	 * @param currentActivity		the context needed for starting this manager.
+	 */
+	public static void performAuthentication(final Activity currentActivity){
+
+		currentActivity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
 				LoginManager.verifyLogin(currentActivity, currentActivity.getIntent());
 			}
 		});
