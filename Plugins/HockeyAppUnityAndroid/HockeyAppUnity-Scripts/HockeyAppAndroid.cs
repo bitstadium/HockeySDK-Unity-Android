@@ -264,22 +264,6 @@ public class HockeyAppAndroid : MonoBehaviour
 	}
 
 	/// <summary>
-	/// The device's model manufacturer name.
-	/// </summary>
-	/// <returns>The device's model manufacturer name.</returns>
-	protected String GetCrashReporterKey ()
-	{
-		string crashReporterKey = null;
-
-		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		crashReporterKey =  jc.CallStatic<string>("getCrashReporterKey");
-		#endif
-
-		return crashReporterKey;
-	}
-
-	/// <summary>
 	/// Collect all header fields for the custom exception report.
 	/// </summary>
 	/// <returns>A list which contains the header fields for a log file.</returns>
@@ -306,9 +290,6 @@ public class HockeyAppAndroid : MonoBehaviour
 
 		string model = GetModel();
 		list.Add("Model: " + model);
-
-		string crashReporterKey = GetCrashReporterKey();
-		list.Add("CrashReporter Key: " + crashReporterKey);
 
 		list.Add("Date: " + DateTime.UtcNow.ToString("ddd MMM dd HH:mm:ss {}zzzz yyyy").Replace("{}", "GMT"));
 		#endif
