@@ -1,5 +1,31 @@
 ## Changelog
 
+### 5.0.1
+
+This is a bugfix release. If you upgrade from version 1.X, please be aware of the breaking changes in version 5.0.0!
+
+* **[IMPROVEMENT]** Uses HockeySDK-Android 5.0.4. Please have a look at it's full changelog.
+* **[BUGFIX]** Fix bug that made it possible to bypass authentication. [#22](https://github.com/bitstadium/HockeySDK-Unity-Android/pull/22).
+* **[BUGFIX]** Fix an issue when using the GUID for crash reports. [#26](https://github.com/bitstadium/HockeySDK-Unity-Android/pull/26)
+* **[BUGFIX]** Fix a bug where merging AndroidManifest.xml would fail. [#11](https://github.com/bitstadium/HockeySDK-Unity-Android/issues/11) 
+
+#### Changelog for HockeySDK-Android 5.0.4
+
+This version contains a few bugfixes as well as the removal of an API that has been deprecated since HockeySDK 3.7.0-Beta.2.
+
+* **Removal of deprecated API** `ExceptionHandler.saveException(Throwable exception, CrashManagerListener listener)` has been deprecated since 3.7.0-beta.2. Use `ExceptionHandler.saveException(Throwable exception, Thread thread, CrashManagerListener listener)` instead.
+* **Bugfix** The SDK now deletes redundant crash reports.
+* **Bugfix** The SDK does no longer send the event that indicates the start of a session twice but once. There was no impact on session counts as the event was de-duplicated on the server.
+* **Bugfix** Fixes a potential deadlock when reading device information when saving an exception.
+* **Bugfix** Fixes a potential NPE when processing stacktraces. Thanks to [Thomas Reis for reporting issue #331](https://github.com/bitstadium/HockeySDK-Android/issues/331).
+
+#### Changelog for HockeySDK-Android 5.0.3
+
+This release now limits the number of crashes that are stored by the SDK while the device is offline to 100 Crashes. HockeySDK-Android will stop to collect crashes until the number of unsent crashes drops below the limit of 100 unsent crashes.
+
+* [BUGFIX] Fixes a possible `OutOfMemoryError` exception. This only occurs when a very large number of crashes – several 100k or more – wasn't sent to the server. [#313](https://github.com/bitstadium/HockeySDK-Android/pull/313)
+
+
 ### 5.0.0
 
 Upgrade to HockeySDK for Android 5.0.2.
