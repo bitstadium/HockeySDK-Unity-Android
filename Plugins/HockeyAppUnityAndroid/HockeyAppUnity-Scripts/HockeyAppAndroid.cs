@@ -1,5 +1,5 @@
 ﻿/*
- * Version: 5.0.0
+ * Version: 5.0.1
  */
 
 using UnityEngine;
@@ -91,6 +91,13 @@ public class HockeyAppAndroid : MonoBehaviour
 		#endif
 	}
 
+	void OnApplicationPause(bool pause)
+	{
+		if (!pause) {
+			PerformAuthentication();
+		}
+	}
+
 	/// <summary>
 	/// Start HockeyApp for Unity.
 	/// </summary>
@@ -111,6 +118,19 @@ public class HockeyAppAndroid : MonoBehaviour
 		instance = this;
 		#endif
 
+	}
+
+	/// <summary>
+	/// Performs user authentication.
+	/// </summary>
+	public static void PerformAuthentication()
+	{	
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
+		AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
+		AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
+		pluginClass.CallStatic("performAuthentication", currentActivity);
+		#endif
 	}
 
 	/// <summary>
@@ -243,21 +263,21 @@ public class HockeyAppAndroid : MonoBehaviour
 		return model;
 	}
 
-	/// <summary>
-	/// The device's model manufacturer name.
-	/// </summary>
-	/// <returns>The device's model manufacturer name.</returns>
-	protected String GetCrashReporterKey ()
-	{
-		string crashReporterKey = null;
+    /// <summary>
+    /// The unique identifier for device, not dependent on package or device.
+    /// </summary>
+    /// <returns>The unique identifier for device, not dependent on package or device.</returns>
+    protected String GetDeviceIdentifier ()
+    {
+        string deviceIdentifier = null;
 
-		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		crashReporterKey =  jc.CallStatic<string>("getCrashReporterKey");
-		#endif
+        #if (UNITY_ANDROID && !UNITY_EDITOR)
+        AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin");
+        deviceIdentifier = jc.CallStatic<string>("getDeviceIdentifier");
+        #endif
 
-		return crashReporterKey;
-	}
+        return deviceIdentifier;
+    }
 
 	/// <summary>
 	/// Collect all header fields for the custom exception report.
@@ -267,7 +287,7 @@ public class HockeyAppAndroid : MonoBehaviour
 	{
 		List<string> list = new List<string> ();
 
-		#if (UNITY_ANDROID && !UNITY_EDITOR)
+#if (UNITY_ANDROID && !UNITY_EDITOR)
 
 		list.Add("Package: " + packageID);
 
@@ -287,13 +307,13 @@ public class HockeyAppAndroid : MonoBehaviour
 		string model = GetModel();
 		list.Add("Model: " + model);
 
-		string crashReporterKey = GetCrashReporterKey();
-		list.Add("CrashReporter Key: " + crashReporterKey);
+		string deviceIdentifier = GetDeviceIdentifier();
+		list.Add("CrashReporter Key: " + deviceIdentifier);
 
 		list.Add("Date: " + DateTime.UtcNow.ToString("ddd MMM dd HH:mm:ss {}zzzz yyyy").Replace("{}", "GMT"));
-		#endif
+#endif
 
-		return list;
+        return list;
 	}
 
 	/// <summary>
