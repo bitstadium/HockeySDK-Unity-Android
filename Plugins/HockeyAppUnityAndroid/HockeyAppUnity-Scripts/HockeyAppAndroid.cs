@@ -1,5 +1,5 @@
 ﻿/*
- * Version: 5.0.0
+ * Version: 5.0.1
  */
 
 using UnityEngine;
@@ -263,6 +263,22 @@ public class HockeyAppAndroid : MonoBehaviour
 		return model;
 	}
 
+    /// <summary>
+    /// The unique identifier for device, not dependent on package or device.
+    /// </summary>
+    /// <returns>The unique identifier for device, not dependent on package or device.</returns>
+    protected String GetDeviceIdentifier ()
+    {
+        string deviceIdentifier = null;
+
+        #if (UNITY_ANDROID && !UNITY_EDITOR)
+        AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin");
+        deviceIdentifier = jc.CallStatic<string>("getDeviceIdentifier");
+        #endif
+
+        return deviceIdentifier;
+    }
+
 	/// <summary>
 	/// Collect all header fields for the custom exception report.
 	/// </summary>
@@ -271,7 +287,7 @@ public class HockeyAppAndroid : MonoBehaviour
 	{
 		List<string> list = new List<string> ();
 
-		#if (UNITY_ANDROID && !UNITY_EDITOR)
+#if (UNITY_ANDROID && !UNITY_EDITOR)
 
 		list.Add("Package: " + packageID);
 
@@ -291,10 +307,13 @@ public class HockeyAppAndroid : MonoBehaviour
 		string model = GetModel();
 		list.Add("Model: " + model);
 
-		list.Add("Date: " + DateTime.UtcNow.ToString("ddd MMM dd HH:mm:ss {}zzzz yyyy").Replace("{}", "GMT"));
-		#endif
+		string deviceIdentifier = GetDeviceIdentifier();
+		list.Add("CrashReporter Key: " + deviceIdentifier);
 
-		return list;
+		list.Add("Date: " + DateTime.UtcNow.ToString("ddd MMM dd HH:mm:ss {}zzzz yyyy").Replace("{}", "GMT"));
+#endif
+
+        return list;
 	}
 
 	/// <summary>
