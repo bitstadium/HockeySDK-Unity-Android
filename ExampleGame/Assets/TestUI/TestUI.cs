@@ -7,14 +7,9 @@ using System.Runtime.InteropServices;
 public class TestUI : MonoBehaviour{
 
 	public GUISkin customUISkin;
-	private int controlHeight = 64;
-	private int horizontalMargin = 20;
-	private int space = 20;
-
-	#if (UNITY_ANDROID && !UNITY_EDITOR)
-	private string appID = "b90dca1145f290bf8031784c196b34df";
-	private string serverURL = "    https://rink.hockeyapp.net/     ";
-	#endif
+	private int controlHeight = 60;
+	private int horizontalMargin = 16;
+	private int space = 16;
 
 	void OnGUI(){	
 
@@ -81,6 +76,11 @@ public class TestUI : MonoBehaviour{
 		{	
 			CheckForUpdate();
 		}
+
+		if (GUI.Button(GetControlRect(13), "Track Event"))
+		{
+			TrackEvent();
+		}
 	}
 
 	private Rect GetControlRect(int controlIndex){
@@ -136,5 +136,17 @@ public class TestUI : MonoBehaviour{
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		HockeyAppAndroid.CheckForUpdate();
 		#endif
+	}
+
+	public void TrackEvent(){
+
+#if (UNITY_ANDROID && !UNITY_EDITOR)
+		HockeyAppAndroid.TrackEvent("Test Unity");
+		HockeyAppAndroid.TrackEvent("Test Unity with properties",
+		    new Dictionary<string, string> { { "Prop1", "Val1" }, { "Prop2", "Val2" } });
+		HockeyAppAndroid.TrackEvent("Test Unity with properties and measurements",
+		    new Dictionary<string, string> { { "Prop1", "Val1" }, { "Prop2", "Val2" } },
+		    new Dictionary<string, double> { { "M1", 1.0 }, { "M2", 2.0 } });
+#endif
 	}
 }
