@@ -11,7 +11,9 @@ using System.Runtime.InteropServices;
 
 public class HockeyAppAndroid : MonoBehaviour
 {
-	
+	private const string JAVA_UNITYPLAYER_CLASS = "com.unity3d.player.UnityPlayer";
+	private const string JAVA_HOCKEYUNITYPLUGIN_CLASS = "net.hockeyapp.unity.HockeyUnityPlugin";
+
 	protected const string HOCKEYAPP_BASEURL = "https://rink.hockeyapp.net/";
 	protected const string HOCKEYAPP_CRASHESPATH = "api/2/apps/[APPID]/crashes/upload";
 	protected const int MAX_CHARS = 199800;
@@ -111,25 +113,28 @@ public class HockeyAppAndroid : MonoBehaviour
 	protected void StartCrashManager (string urlString, string appID, string secret, int authType, bool updateManagerEnabled, bool userMetricsEnabled, bool autoSendEnabled)
 	{
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
-		AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
-		AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		pluginClass.CallStatic("startHockeyAppManager", currentActivity, urlString, appID, secret, authType, updateManagerEnabled, userMetricsEnabled, autoSendEnabled);
+		using (var unityPlayer = new AndroidJavaClass(JAVA_UNITYPLAYER_CLASS))
+		using (var pluginClass = new AndroidJavaClass(JAVA_HOCKEYUNITYPLUGIN_CLASS))
+		{
+			var currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+			pluginClass.CallStatic("startHockeyAppManager", currentActivity, urlString, appID, secret, authType, updateManagerEnabled, userMetricsEnabled, autoSendEnabled);
+		}
 		instance = this;
 		#endif
-
 	}
 
 	/// <summary>
 	/// Performs user authentication.
 	/// </summary>
 	public static void PerformAuthentication()
-	{	
+	{
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
-		AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
-		AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		pluginClass.CallStatic("performAuthentication", currentActivity);
+		using (var unityPlayer = new AndroidJavaClass(JAVA_UNITYPLAYER_CLASS))
+		using (var pluginClass = new AndroidJavaClass(JAVA_HOCKEYUNITYPLUGIN_CLASS))
+		{
+			var currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+			pluginClass.CallStatic("performAuthentication", currentActivity);
+		}
 		#endif
 	}
 
@@ -137,13 +142,15 @@ public class HockeyAppAndroid : MonoBehaviour
 	/// Check for version update and present alert if newer version is available.
 	/// </summary>
 	public static void CheckForUpdate()
-	{	
+	{
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		if (instance != null) {
-			AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
-			AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
-			AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-			pluginClass.CallStatic("checkForUpdate", currentActivity, instance.serverURL, instance.appID);
+			using (var unityPlayer = new AndroidJavaClass(JAVA_UNITYPLAYER_CLASS))
+			using (var pluginClass = new AndroidJavaClass(JAVA_HOCKEYUNITYPLUGIN_CLASS))
+			{
+				var currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+				pluginClass.CallStatic("checkForUpdate", currentActivity, instance.serverURL, instance.appID);
+			}
 		} else {
 			Debug.Log("Failed to check for update. SDK has not been initialized, yet.");
 		}
@@ -154,130 +161,23 @@ public class HockeyAppAndroid : MonoBehaviour
 	/// Display a feedback form.
 	/// </summary>
 	public static void ShowFeedbackForm()
-	{	
+	{
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		if (instance != null) {
-			AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
-			AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
-			AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-			pluginClass.CallStatic("startFeedbackForm", currentActivity);
-		} else {
+		if (instance != null)
+		{
+			using (var unityPlayer = new AndroidJavaClass(JAVA_UNITYPLAYER_CLASS))
+			using (var pluginClass = new AndroidJavaClass(JAVA_HOCKEYUNITYPLUGIN_CLASS))
+			{
+				var currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+				pluginClass.CallStatic("startFeedbackForm", currentActivity);
+			}
+		}
+		else
+		{
 			Debug.Log("Failed to present feedback form. SDK has not been initialized, yet.");
 		}
 		#endif
 	}
-
-	/// <summary>
-	/// Get the version code of the app.
-	/// </summary>
-	/// <returns>The version code of the Android app.</returns>
-	protected String GetVersionCode ()
-	{
-		string versionCode = null;
-
-		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		versionCode =  jc.CallStatic<string>("getVersionCode");
-		#endif
-
-		return versionCode;
-	}
-
-	/// <summary>
-	/// Get the version name of the app.
-	/// </summary>
-	/// <returns>The version name of the Android app.</returns>
-	protected String GetVersionName ()
-	{
-		string versionName = null;
-		
-		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		versionName =  jc.CallStatic<string>("getVersionName");
-		#endif
-		
-		return versionName;
-	}
-
-	/// <summary>
-	/// Get the SDK version.
-	/// </summary>
-	/// <returns>The SDK version.</returns>
-	protected String GetSdkVersion ()
-	{
-		string sdkVersion = null;
-		
-		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		sdkVersion =  jc.CallStatic<string>("getSdkVersion");
-		#endif
-		
-		return sdkVersion;
-	}
-
-	/// <summary>
-	/// Get the name of the SDK.
-	/// </summary>
-	/// <returns>The name of the SDK.</returns>
-	protected String GetSdkName ()
-	{
-		string sdkName = null;
-		
-		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		sdkName =  jc.CallStatic<string>("getSdkName");
-		#endif
-		
-		return sdkName;
-	}
-
-	/// <summary>
-	/// The device's model manufacturer name.
-	/// </summary>
-	/// <returns>The device's model manufacturer name.</returns>
-	protected String GetManufacturer ()
-	{
-		string manufacturer = null;
-
-		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		manufacturer =  jc.CallStatic<string>("getManufacturer");
-		#endif
-
-		return manufacturer;
-	}
-
-	/// <summary>
-	/// The device's model name.
-	/// </summary>
-	/// <returns>The device's model name.</returns>
-	protected String GetModel ()
-	{
-		string model = null;
-
-		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		model =  jc.CallStatic<string>("getModel");
-		#endif
-
-		return model;
-	}
-
-    /// <summary>
-    /// The unique identifier for device, not dependent on package or device.
-    /// </summary>
-    /// <returns>The unique identifier for device, not dependent on package or device.</returns>
-    protected String GetDeviceIdentifier ()
-    {
-        string deviceIdentifier = null;
-
-        #if (UNITY_ANDROID && !UNITY_EDITOR)
-        AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin");
-        deviceIdentifier = jc.CallStatic<string>("getDeviceIdentifier");
-        #endif
-
-        return deviceIdentifier;
-    }
 
 	/// <summary>
 	/// Collect all header fields for the custom exception report.
@@ -287,33 +187,33 @@ public class HockeyAppAndroid : MonoBehaviour
 	{
 		List<string> list = new List<string> ();
 
-#if (UNITY_ANDROID && !UNITY_EDITOR)
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		using (var pluginClass = new AndroidJavaClass(JAVA_HOCKEYUNITYPLUGIN_CLASS))
+		{
+			var versionCode = pluginClass.CallStatic<string>("getVersionCode");
+			var versionName = pluginClass.CallStatic<string>("getVersionName");
+			var sdkVersion = pluginClass.CallStatic<string>("getSdkVersion");
+			var sdkName = pluginClass.CallStatic<string>("getSdkName");
+			var manufacturer = pluginClass.CallStatic<string>("getManufacturer");
+			var model = pluginClass.CallStatic<string>("getModel");
+			var deviceIdentifier = pluginClass.CallStatic<string>("getDeviceIdentifier");
 
-		list.Add("Package: " + packageID);
+			list.Add("Package: " + packageID);
+			list.Add("Version Code: " + versionCode);
+			list.Add("Version Name: " + versionName);
 
-		string versionCode = GetVersionCode();
-		list.Add("Version Code: " + versionCode);
+			var versionComponents = SystemInfo.operatingSystem.Split('/');
+			var osVersion = "Android: " + versionComponents[0].Replace("Android OS ", "");
+			list.Add (osVersion);
 
-		string versionName = GetVersionName();
-		list.Add("Version Name: " + versionName);
+			list.Add("Manufacturer: " + manufacturer);
+			list.Add("Model: " + model);
+			list.Add("CrashReporter Key: " + deviceIdentifier);
+			list.Add("Date: " + DateTime.UtcNow.ToString("ddd MMM dd HH:mm:ss {}zzzz yyyy").Replace("{}", "GMT"));
+		}
+		#endif
 
-		string[] versionComponents = SystemInfo.operatingSystem.Split('/');
-		string osVersion = "Android: " + versionComponents[0].Replace("Android OS ", "");
-		list.Add (osVersion);
-
-		string manufacturer = GetManufacturer();
-		list.Add("Manufacturer: " + manufacturer);
-
-		string model = GetModel();
-		list.Add("Model: " + model);
-
-		string deviceIdentifier = GetDeviceIdentifier();
-		list.Add("CrashReporter Key: " + deviceIdentifier);
-
-		list.Add("Date: " + DateTime.UtcNow.ToString("ddd MMM dd HH:mm:ss {}zzzz yyyy").Replace("{}", "GMT"));
-#endif
-
-        return list;
+		return list;
 	}
 
 	/// <summary>
