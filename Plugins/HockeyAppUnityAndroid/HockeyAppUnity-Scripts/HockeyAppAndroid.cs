@@ -124,6 +124,81 @@ public class HockeyAppAndroid : MonoBehaviour
 	}
 
 	/// <summary>
+	/// This method allows to track an event that happened in your app.
+	/// Remember to choose meaningful event names to have the best experience when diagnosing your app
+	/// in the web portal.
+	/// </summary>
+	/// <param name="eventName">The name of the event, which should be tracked.</param>
+	public static void TrackEvent(string eventName)
+	{
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		if (instance != null)
+		{
+			using (var pluginClass = new AndroidJavaClass(JAVA_HOCKEYUNITYPLUGIN_CLASS))
+			{
+				pluginClass.CallStatic("trackEvent", eventName);
+			}
+		}
+		else
+		{
+			Debug.Log("Failed to check for update. SDK has not been initialized, yet.");
+		}
+		#endif
+	}
+
+	/// <summary>
+	/// This method allows to track an event that happened in your app.
+	/// Remember to choose meaningful event names to have the best experience when diagnosing your app
+	/// in the web portal.
+	/// </summary>
+	/// <param name="eventName">The name of the event, which should be tracked.</param>
+	/// <param name="measurements">Key value pairs, which contain custom metrics.</param>
+	public static void TrackEvent(string eventName, IDictionary<string, string> properties)
+	{
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		if (instance != null)
+		{
+			using (var pluginClass = new AndroidJavaClass(JAVA_HOCKEYUNITYPLUGIN_CLASS))
+			{
+				pluginClass.CallStatic("trackEvent", eventName,
+					DictainaryToJavaMap(properties, "java.lang.String", "java.lang.String"));
+			}
+		}
+		else
+		{
+			Debug.Log("Failed to check for update. SDK has not been initialized, yet.");
+		}
+		#endif
+	}
+
+	/// <summary>
+	/// This method allows to track an event that happened in your app.
+	/// Remember to choose meaningful event names to have the best experience when diagnosing your app
+	/// in the web portal.
+	/// </summary>
+	/// <param name="eventName">The name of the event, which should be tracked.</param>
+	/// <param name="properties">Key value pairs with additional info about the event.</param>
+	/// <param name="measurements">Key value pairs, which contain custom metrics.</param>
+	public static void TrackEvent(string eventName, IDictionary<string, string> properties, IDictionary<string, double> measurements)
+	{
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		if (instance != null)
+		{
+			using (var pluginClass = new AndroidJavaClass(JAVA_HOCKEYUNITYPLUGIN_CLASS))
+			{
+				pluginClass.CallStatic("trackEvent", eventName,
+					DictainaryToJavaMap(properties, "java.lang.String", "java.lang.String"),
+					DictainaryToJavaMap(measurements, "java.lang.String", "java.lang.Double"));
+			}
+		}
+		else
+		{
+			Debug.Log("Failed to check for update. SDK has not been initialized, yet.");
+		}
+		#endif
+	}
+
+	/// <summary>
 	/// Performs user authentication.
 	/// </summary>
 	public static void PerformAuthentication()
@@ -144,14 +219,17 @@ public class HockeyAppAndroid : MonoBehaviour
 	public static void CheckForUpdate()
 	{
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		if (instance != null) {
+		if (instance != null)
+		{
 			using (var unityPlayer = new AndroidJavaClass(JAVA_UNITYPLAYER_CLASS))
 			using (var pluginClass = new AndroidJavaClass(JAVA_HOCKEYUNITYPLUGIN_CLASS))
 			{
 				var currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
 				pluginClass.CallStatic("checkForUpdate", currentActivity, instance.serverURL, instance.appID);
 			}
-		} else {
+		}
+		else
+		{
 			Debug.Log("Failed to check for update. SDK has not been initialized, yet.");
 		}
 		#endif
@@ -332,9 +410,12 @@ public class HockeyAppAndroid : MonoBehaviour
 		string url = GetBaseURL () + crashPath.Replace ("[APPID]", appID);
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		string sdkName = GetSdkName ();
-		if (sdkName != null) {
-			url+= "?sdk=" + WWW.EscapeURL(sdkName);
+		using (var pluginClass = new AndroidJavaClass(JAVA_HOCKEYUNITYPLUGIN_CLASS))
+		{
+			var sdkName = pluginClass.CallStatic<string>("getSdkName");
+			if (sdkName != null) {
+				url += "?sdk=" + WWW.EscapeURL(sdkName);
+			}
 		}
 		#endif
 
@@ -474,4 +555,29 @@ public class HockeyAppAndroid : MonoBehaviour
 		}
 		#endif
 	}
+
+	#region Android Binding Helpers
+	#if (UNITY_ANDROID && !UNITY_EDITOR)
+
+	private static AndroidJavaObject DictainaryToJavaMap<TKey, TValue>(IDictionary<TKey, TValue> parameters, string javaKeyClass, string javaValueClass)
+	{
+		if (parameters == null)
+		{
+			return null;
+		}
+		var javaMap = new AndroidJavaObject("java.util.HashMap");
+		var putMethod = AndroidJNIHelper.GetMethodID(javaMap.GetRawClass(), "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+		foreach (var kvp in parameters)
+		{
+			AndroidJNI.CallObjectMethod(javaMap.GetRawObject(), putMethod, AndroidJNIHelper.CreateJNIArgArray(new object[]
+				{
+					new AndroidJavaObject(javaKeyClass, kvp.Key),
+					new AndroidJavaObject(javaValueClass, kvp.Value)
+				}));
+		}
+		return javaMap;
+	}
+
+	#endif
+	#endregion
 }
