@@ -11,12 +11,14 @@ using System.Runtime.InteropServices;
 
 public class HockeyAppAndroid : MonoBehaviour
 {
-	
+	private const string JAVA_UNITYPLAYER_CLASS = "com.unity3d.player.UnityPlayer";
+	private const string JAVA_HOCKEYUNITYPLUGIN_CLASS = "net.hockeyapp.unity.HockeyUnityPlugin";
+
 	protected const string HOCKEYAPP_BASEURL = "https://rink.hockeyapp.net/";
 	protected const string HOCKEYAPP_CRASHESPATH = "api/2/apps/[APPID]/crashes/upload";
 	protected const int MAX_CHARS = 199800;
 	protected const string LOG_FILE_DIR = "/logs/";
-	private const string SERVER_URL_PLACEHOLDER = "your-custom-server-url"; 
+	private const string SERVER_URL_PLACEHOLDER = "your-custom-server-url";
 	private static HockeyAppAndroid instance;
 
 	public enum AuthenticatorType
@@ -48,7 +50,6 @@ public class HockeyAppAndroid : MonoBehaviour
 
 	void Awake ()
 	{
-
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		if (instance != null) {
 			Destroy(gameObject);
@@ -69,10 +70,10 @@ public class HockeyAppAndroid : MonoBehaviour
 		StartCrashManager(serverURL, appID, secret, authType, updateAlert, userMetrics, autoUploadCrashes);
 		#endif
 	}
-	
+
 	void OnEnable ()
 	{
-		
+
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		if(exceptionLogging == true) {
 			System.AppDomain.CurrentDomain.UnhandledException += OnHandleUnresolvedException;
@@ -80,7 +81,7 @@ public class HockeyAppAndroid : MonoBehaviour
 		}
 		#endif
 	}
-	
+
 	void OnDisable ()
 	{
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
@@ -111,25 +112,103 @@ public class HockeyAppAndroid : MonoBehaviour
 	protected void StartCrashManager (string urlString, string appID, string secret, int authType, bool updateManagerEnabled, bool userMetricsEnabled, bool autoSendEnabled)
 	{
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
-		AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
-		AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		pluginClass.CallStatic("startHockeyAppManager", currentActivity, urlString, appID, secret, authType, updateManagerEnabled, userMetricsEnabled, autoSendEnabled);
+		using (var unityPlayer = new AndroidJavaClass(JAVA_UNITYPLAYER_CLASS))
+		using (var pluginClass = new AndroidJavaClass(JAVA_HOCKEYUNITYPLUGIN_CLASS))
+		{
+			var currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+			pluginClass.CallStatic("startHockeyAppManager", currentActivity, urlString, appID, secret, authType, updateManagerEnabled, userMetricsEnabled, autoSendEnabled);
+		}
 		instance = this;
 		#endif
+	}
 
+	/// <summary>
+	/// This method allows to track an event that happened in your app.
+	/// Remember to choose meaningful event names to have the best experience when diagnosing your app
+	/// in the web portal.
+	/// </summary>
+	/// <param name="eventName">The name of the event, which should be tracked.</param>
+	public static void TrackEvent(string eventName)
+	{
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		if (instance != null)
+		{
+			using (var pluginClass = new AndroidJavaClass(JAVA_HOCKEYUNITYPLUGIN_CLASS))
+			{
+				pluginClass.CallStatic("trackEvent", eventName);
+			}
+		}
+		else
+		{
+			Debug.Log("Failed to check for update. SDK has not been initialized, yet.");
+		}
+		#endif
+	}
+
+	/// <summary>
+	/// This method allows to track an event that happened in your app.
+	/// Remember to choose meaningful event names to have the best experience when diagnosing your app
+	/// in the web portal.
+	/// </summary>
+	/// <param name="eventName">The name of the event, which should be tracked.</param>
+	/// <param name="measurements">Key value pairs, which contain custom metrics.</param>
+	public static void TrackEvent(string eventName, IDictionary<string, string> properties)
+	{
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		if (instance != null)
+		{
+			using (var pluginClass = new AndroidJavaClass(JAVA_HOCKEYUNITYPLUGIN_CLASS))
+			{
+				pluginClass.CallStatic("trackEvent", eventName,
+					DictainaryToJavaMap(properties, "java.lang.String", "java.lang.String"));
+			}
+		}
+		else
+		{
+			Debug.Log("Failed to check for update. SDK has not been initialized, yet.");
+		}
+		#endif
+	}
+
+	/// <summary>
+	/// This method allows to track an event that happened in your app.
+	/// Remember to choose meaningful event names to have the best experience when diagnosing your app
+	/// in the web portal.
+	/// </summary>
+	/// <param name="eventName">The name of the event, which should be tracked.</param>
+	/// <param name="properties">Key value pairs with additional info about the event.</param>
+	/// <param name="measurements">Key value pairs, which contain custom metrics.</param>
+	public static void TrackEvent(string eventName, IDictionary<string, string> properties, IDictionary<string, double> measurements)
+	{
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		if (instance != null)
+		{
+			using (var pluginClass = new AndroidJavaClass(JAVA_HOCKEYUNITYPLUGIN_CLASS))
+			{
+				pluginClass.CallStatic("trackEvent", eventName,
+					DictainaryToJavaMap(properties, "java.lang.String", "java.lang.String"),
+					DictainaryToJavaMap(measurements, "java.lang.String", "java.lang.Double"));
+			}
+		}
+		else
+		{
+			Debug.Log("Failed to check for update. SDK has not been initialized, yet.");
+		}
+		#endif
 	}
 
 	/// <summary>
 	/// Performs user authentication.
 	/// </summary>
 	public static void PerformAuthentication()
-	{	
+	{
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
-		AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
-		AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		pluginClass.CallStatic("performAuthentication", currentActivity);
+		using (var unityPlayer = new AndroidJavaClass(JAVA_UNITYPLAYER_CLASS))
+		using (var pluginClass = new AndroidJavaClass(JAVA_HOCKEYUNITYPLUGIN_CLASS))
+		{
+			var currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+			pluginClass.CallStatic("performAuthentication", currentActivity);
+		}
 		#endif
 	}
 
@@ -137,14 +216,19 @@ public class HockeyAppAndroid : MonoBehaviour
 	/// Check for version update and present alert if newer version is available.
 	/// </summary>
 	public static void CheckForUpdate()
-	{	
+	{
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		if (instance != null) {
-			AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
-			AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
-			AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-			pluginClass.CallStatic("checkForUpdate", currentActivity, instance.serverURL, instance.appID);
-		} else {
+		if (instance != null)
+		{
+			using (var unityPlayer = new AndroidJavaClass(JAVA_UNITYPLAYER_CLASS))
+			using (var pluginClass = new AndroidJavaClass(JAVA_HOCKEYUNITYPLUGIN_CLASS))
+			{
+				var currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+				pluginClass.CallStatic("checkForUpdate", currentActivity, instance.serverURL, instance.appID);
+			}
+		}
+		else
+		{
 			Debug.Log("Failed to check for update. SDK has not been initialized, yet.");
 		}
 		#endif
@@ -154,130 +238,23 @@ public class HockeyAppAndroid : MonoBehaviour
 	/// Display a feedback form.
 	/// </summary>
 	public static void ShowFeedbackForm()
-	{	
+	{
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		if (instance != null) {
-			AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
-			AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"); 
-			AndroidJavaClass pluginClass = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-			pluginClass.CallStatic("startFeedbackForm", currentActivity);
-		} else {
+		if (instance != null)
+		{
+			using (var unityPlayer = new AndroidJavaClass(JAVA_UNITYPLAYER_CLASS))
+			using (var pluginClass = new AndroidJavaClass(JAVA_HOCKEYUNITYPLUGIN_CLASS))
+			{
+				var currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+				pluginClass.CallStatic("startFeedbackForm", currentActivity);
+			}
+		}
+		else
+		{
 			Debug.Log("Failed to present feedback form. SDK has not been initialized, yet.");
 		}
 		#endif
 	}
-
-	/// <summary>
-	/// Get the version code of the app.
-	/// </summary>
-	/// <returns>The version code of the Android app.</returns>
-	protected String GetVersionCode ()
-	{
-		string versionCode = null;
-
-		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		versionCode =  jc.CallStatic<string>("getVersionCode");
-		#endif
-
-		return versionCode;
-	}
-
-	/// <summary>
-	/// Get the version name of the app.
-	/// </summary>
-	/// <returns>The version name of the Android app.</returns>
-	protected String GetVersionName ()
-	{
-		string versionName = null;
-		
-		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		versionName =  jc.CallStatic<string>("getVersionName");
-		#endif
-		
-		return versionName;
-	}
-
-	/// <summary>
-	/// Get the SDK version.
-	/// </summary>
-	/// <returns>The SDK version.</returns>
-	protected String GetSdkVersion ()
-	{
-		string sdkVersion = null;
-		
-		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		sdkVersion =  jc.CallStatic<string>("getSdkVersion");
-		#endif
-		
-		return sdkVersion;
-	}
-
-	/// <summary>
-	/// Get the name of the SDK.
-	/// </summary>
-	/// <returns>The name of the SDK.</returns>
-	protected String GetSdkName ()
-	{
-		string sdkName = null;
-		
-		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		sdkName =  jc.CallStatic<string>("getSdkName");
-		#endif
-		
-		return sdkName;
-	}
-
-	/// <summary>
-	/// The device's model manufacturer name.
-	/// </summary>
-	/// <returns>The device's model manufacturer name.</returns>
-	protected String GetManufacturer ()
-	{
-		string manufacturer = null;
-
-		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		manufacturer =  jc.CallStatic<string>("getManufacturer");
-		#endif
-
-		return manufacturer;
-	}
-
-	/// <summary>
-	/// The device's model name.
-	/// </summary>
-	/// <returns>The device's model name.</returns>
-	protected String GetModel ()
-	{
-		string model = null;
-
-		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin"); 
-		model =  jc.CallStatic<string>("getModel");
-		#endif
-
-		return model;
-	}
-
-    /// <summary>
-    /// The unique identifier for device, not dependent on package or device.
-    /// </summary>
-    /// <returns>The unique identifier for device, not dependent on package or device.</returns>
-    protected String GetDeviceIdentifier ()
-    {
-        string deviceIdentifier = null;
-
-        #if (UNITY_ANDROID && !UNITY_EDITOR)
-        AndroidJavaClass jc = new AndroidJavaClass("net.hockeyapp.unity.HockeyUnityPlugin");
-        deviceIdentifier = jc.CallStatic<string>("getDeviceIdentifier");
-        #endif
-
-        return deviceIdentifier;
-    }
 
 	/// <summary>
 	/// Collect all header fields for the custom exception report.
@@ -287,33 +264,33 @@ public class HockeyAppAndroid : MonoBehaviour
 	{
 		List<string> list = new List<string> ();
 
-#if (UNITY_ANDROID && !UNITY_EDITOR)
+		#if (UNITY_ANDROID && !UNITY_EDITOR)
+		using (var pluginClass = new AndroidJavaClass(JAVA_HOCKEYUNITYPLUGIN_CLASS))
+		{
+			var versionCode = pluginClass.CallStatic<string>("getVersionCode");
+			var versionName = pluginClass.CallStatic<string>("getVersionName");
+			var sdkVersion = pluginClass.CallStatic<string>("getSdkVersion");
+			var sdkName = pluginClass.CallStatic<string>("getSdkName");
+			var manufacturer = pluginClass.CallStatic<string>("getManufacturer");
+			var model = pluginClass.CallStatic<string>("getModel");
+			var deviceIdentifier = pluginClass.CallStatic<string>("getDeviceIdentifier");
 
-		list.Add("Package: " + packageID);
+			list.Add("Package: " + packageID);
+			list.Add("Version Code: " + versionCode);
+			list.Add("Version Name: " + versionName);
 
-		string versionCode = GetVersionCode();
-		list.Add("Version Code: " + versionCode);
+			var versionComponents = SystemInfo.operatingSystem.Split('/');
+			var osVersion = "Android: " + versionComponents[0].Replace("Android OS ", "");
+			list.Add (osVersion);
 
-		string versionName = GetVersionName();
-		list.Add("Version Name: " + versionName);
+			list.Add("Manufacturer: " + manufacturer);
+			list.Add("Model: " + model);
+			list.Add("CrashReporter Key: " + deviceIdentifier);
+			list.Add("Date: " + DateTime.UtcNow.ToString("ddd MMM dd HH:mm:ss {}zzzz yyyy").Replace("{}", "GMT"));
+		}
+		#endif
 
-		string[] versionComponents = SystemInfo.operatingSystem.Split('/');
-		string osVersion = "Android: " + versionComponents[0].Replace("Android OS ", "");
-		list.Add (osVersion);
-
-		string manufacturer = GetManufacturer();
-		list.Add("Manufacturer: " + manufacturer);
-
-		string model = GetModel();
-		list.Add("Model: " + model);
-
-		string deviceIdentifier = GetDeviceIdentifier();
-		list.Add("CrashReporter Key: " + deviceIdentifier);
-
-		list.Add("Date: " + DateTime.UtcNow.ToString("ddd MMM dd HH:mm:ss {}zzzz yyyy").Replace("{}", "GMT"));
-#endif
-
-        return list;
+		return list;
 	}
 
 	/// <summary>
@@ -328,24 +305,24 @@ public class HockeyAppAndroid : MonoBehaviour
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		byte[] bytes = null;
 		using(FileStream fs = File.OpenRead(log)){
-			
+
 			if (fs.Length > MAX_CHARS) {
 				string resizedLog = null;
-				
+
 				using(StreamReader reader = new StreamReader(fs)) {
-					
+
 					reader.BaseStream.Seek( fs.Length - MAX_CHARS, SeekOrigin.Begin );
 					resizedLog = reader.ReadToEnd();
 				}
-				
+
 				List<string> logHeaders = GetLogHeaders();
 				string logHeader = "";
-				
+
 				foreach (string header in logHeaders) {
 					logHeader += header + "\n";
 				}
 				resizedLog = logHeader + "\n" + "[...]" + resizedLog;
-				
+
 				try {
 					bytes = System.Text.Encoding.Default.GetBytes(resizedLog);
 				} catch(ArgumentException ae) {
@@ -363,13 +340,13 @@ public class HockeyAppAndroid : MonoBehaviour
 				}
 			}
 		}
-		
+
 		if(bytes != null) {
 			form.AddBinaryData("log", bytes, log, "text/plain");
 		}
-		
+
 		#endif
-		
+
 		return form;
 	}
 
@@ -380,7 +357,7 @@ public class HockeyAppAndroid : MonoBehaviour
 	{
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		string logsDirectoryPath = Application.persistentDataPath + LOG_FILE_DIR;
-		
+
 		try {
 			Directory.CreateDirectory (logsDirectoryPath);
 		} catch (Exception e) {
@@ -396,14 +373,14 @@ public class HockeyAppAndroid : MonoBehaviour
 	protected virtual List<string> GetLogFiles ()
 	{
 		List<string> logs = new List<string> ();
-		
+
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		string logsDirectoryPath = Application.persistentDataPath + LOG_FILE_DIR;
-		
+
 		try {
 			DirectoryInfo info = new DirectoryInfo(logsDirectoryPath);
 			FileInfo[] files = info.GetFiles();
-			
+
 			if (files.Length > 0) {
 				foreach (FileInfo file in files) {
 					if (file.Extension == ".log") {
@@ -419,7 +396,7 @@ public class HockeyAppAndroid : MonoBehaviour
 			}
 		}
 		#endif
-		
+
 		return logs;
 	}
 
@@ -432,13 +409,16 @@ public class HockeyAppAndroid : MonoBehaviour
 		string url = GetBaseURL () + crashPath.Replace ("[APPID]", appID);
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		string sdkName = GetSdkName ();
-		if (sdkName != null) {
-			url+= "?sdk=" + WWW.EscapeURL(sdkName);
+		using (var pluginClass = new AndroidJavaClass(JAVA_HOCKEYUNITYPLUGIN_CLASS))
+		{
+			var sdkName = pluginClass.CallStatic<string>("getSdkName");
+			if (sdkName != null) {
+				url += "?sdk=" + WWW.EscapeURL(sdkName);
+			}
 		}
 		#endif
 
-		foreach (string log in logs) {		
+		foreach (string log in logs) {
 			WWWForm postForm = CreateForm (log);
 			string lContent = postForm.headers ["Content-Type"].ToString ();
 			lContent = lContent.Replace ("\"", "");
@@ -469,14 +449,14 @@ public class HockeyAppAndroid : MonoBehaviour
 		string logSession = DateTime.Now.ToString("yyyy-MM-dd-HH_mm_ss_fff");
 		string log = logString.Replace("\n", " ");
 		string[]stacktraceLines = stackTrace.Split('\n');
-		
+
 		log = "\n" + log + "\n";
 		foreach (string line in stacktraceLines) {
 			if(line.Length > 0) {
 				log +="  at " + line + "\n";
 			}
 		}
-		
+
 		List<string> logHeaders = GetLogHeaders();
 		using (StreamWriter file = new StreamWriter(Application.persistentDataPath + LOG_FILE_DIR + "LogFile_" + logSession + ".log", true)) {
 			foreach (string header in logHeaders) {
@@ -492,15 +472,15 @@ public class HockeyAppAndroid : MonoBehaviour
 	/// </summary>
 	/// <returns>A formatted base url.</returns>
 	protected virtual string GetBaseURL ()
-	{	
+	{
 		string baseURL = "";
-		
+
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 
 		string urlString = serverURL.Trim();
 		if(urlString.Length > 0 && urlString != SERVER_URL_PLACEHOLDER) {
 			baseURL = urlString;
-			
+
 			if(baseURL[baseURL.Length -1].Equals("/") != true) {
 				baseURL += "/";
 			}
@@ -508,10 +488,10 @@ public class HockeyAppAndroid : MonoBehaviour
 			baseURL = HOCKEYAPP_BASEURL;
 		}
 		#endif
-		
+
 		return baseURL;
 	}
-	
+
 	/// <summary>
 	/// Checks whether internet is reachable
 	/// </summary>
@@ -520,13 +500,13 @@ public class HockeyAppAndroid : MonoBehaviour
 		bool connected = false;
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		
-		if  (Application.internetReachability == NetworkReachability.ReachableViaLocalAreaNetwork || 
+
+		if  (Application.internetReachability == NetworkReachability.ReachableViaLocalAreaNetwork ||
 		     (Application.internetReachability == NetworkReachability.ReachableViaCarrierDataNetwork)) {
 			connected = true;
 		}
 		#endif
-		
+
 		return connected;
 	}
 
@@ -537,7 +517,7 @@ public class HockeyAppAndroid : MonoBehaviour
 	/// <param name="stackTrace">The stacktrace for the exception.</param>
 	protected virtual void HandleException (string logString, string stackTrace)
 	{
-		
+
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
 		WriteLogToDisk(logString, stackTrace);
 		#endif
@@ -552,9 +532,9 @@ public class HockeyAppAndroid : MonoBehaviour
 	public void OnHandleLogCallback (string logString, string stackTrace, LogType type)
 	{
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		if(LogType.Assert == type || LogType.Exception == type || LogType.Error == type) {	
+		if(LogType.Assert == type || LogType.Exception == type || LogType.Error == type) {
 			HandleException(logString, stackTrace);
-		}	
+		}
 		#endif
 	}
 
@@ -564,14 +544,39 @@ public class HockeyAppAndroid : MonoBehaviour
 	public void OnHandleUnresolvedException (object sender, System.UnhandledExceptionEventArgs args)
 	{
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		if(args == null || args.ExceptionObject == null) {	
-			return;	
+		if(args == null || args.ExceptionObject == null) {
+			return;
 		}
 
-		if(args.ExceptionObject.GetType() == typeof(System.Exception)) {	
+		if(args.ExceptionObject.GetType() == typeof(System.Exception)) {
 			System.Exception e	= (System.Exception)args.ExceptionObject;
 			HandleException(e.Source, e.StackTrace);
 		}
 		#endif
 	}
+
+	#region Android Binding Helpers
+	#if (UNITY_ANDROID && !UNITY_EDITOR)
+
+	private static AndroidJavaObject DictainaryToJavaMap<TKey, TValue>(IDictionary<TKey, TValue> parameters, string javaKeyClass, string javaValueClass)
+	{
+		if (parameters == null)
+		{
+			return null;
+		}
+		var javaMap = new AndroidJavaObject("java.util.HashMap");
+		var putMethod = AndroidJNIHelper.GetMethodID(javaMap.GetRawClass(), "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+		foreach (var kvp in parameters)
+		{
+			AndroidJNI.CallObjectMethod(javaMap.GetRawObject(), putMethod, AndroidJNIHelper.CreateJNIArgArray(new object[]
+				{
+					new AndroidJavaObject(javaKeyClass, kvp.Key),
+					new AndroidJavaObject(javaValueClass, kvp.Value)
+				}));
+		}
+		return javaMap;
+	}
+
+	#endif
+	#endregion
 }
