@@ -62,6 +62,7 @@ public class HockeyAppAndroid : MonoBehaviour
 		if(exceptionLogging == true  && IsConnected() == true) {
 			List<string> logFileDirs = GetLogFiles();
 			if(logFileDirs.Count > 0) {
+				Debug.Log("Found files: " + logFileDirs.Count);
 				StartCoroutine(SendLogs(logFileDirs));
 			}
 		}
@@ -432,6 +433,9 @@ public class HockeyAppAndroid : MonoBehaviour
 					if (Debug.isDebugBuild)
 						Debug.Log ("Failed to delete exception log: " + e);
 				}
+			} else {
+				if (Debug.isDebugBuild)
+					Debug.Log ("Crash sending error: " + www.error);
 			}
 		}
 	}
@@ -517,7 +521,14 @@ public class HockeyAppAndroid : MonoBehaviour
 	{
 
 		#if (UNITY_ANDROID && !UNITY_EDITOR)
-		WriteLogToDisk(logString, stackTrace);
+		try
+		{
+			WriteLogToDisk(logString, stackTrace);
+		}
+		catch (Exception e)
+		{
+			AndroidLog(e.ToString());
+		}
 		#endif
 	}
 
@@ -573,6 +584,12 @@ public class HockeyAppAndroid : MonoBehaviour
 				}));
 		}
 		return javaMap;
+	}
+
+	private static void AndroidLog(string message)
+	{
+		var logClass = new AndroidJavaObject("android.util.Log");
+		logClass.CallStatic<int>("d", "HockeyApp", message);
 	}
 
 	#endif
