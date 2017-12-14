@@ -269,8 +269,6 @@ public class HockeyAppAndroid : MonoBehaviour
 		{
 			var versionCode = pluginClass.CallStatic<string>("getVersionCode");
 			var versionName = pluginClass.CallStatic<string>("getVersionName");
-			var sdkVersion = pluginClass.CallStatic<string>("getSdkVersion");
-			var sdkName = pluginClass.CallStatic<string>("getSdkName");
 			var manufacturer = pluginClass.CallStatic<string>("getManufacturer");
 			var model = pluginClass.CallStatic<string>("getModel");
 			var deviceIdentifier = pluginClass.CallStatic<string>("getDeviceIdentifier");
