@@ -12,6 +12,7 @@ import net.hockeyapp.android.metrics.MetricsManager;
 import net.hockeyapp.android.utils.HockeyLog;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
@@ -238,7 +239,47 @@ public class HockeyUnityPlugin {
             return null;
         }
     }
+    //---------------------------------------------------------------------------------------
+    //endregion
 
+    //region METRICS MANAGER
+    //---------------------------------------------------------------------------------------
+
+    /**
+     *  This method allows to track an event that happened in your app.
+     *  Remember to choose meaningful event names to have the best experience when diagnosing your app
+     *  in the web portal.
+     *
+     *  @param eventName the name of the event, which should be tracked.
+     */
+    public static void trackEvent(final String eventName) {
+        MetricsManager.trackEvent(eventName);
+    }
+
+    /**
+     *  This method allows to track an event that happened in your app.
+     *  Remember to choose meaningful event names to have the best experience when diagnosing your app
+     *  in the web portal.
+     *
+     *  @param eventName the name of the event, which should be tracked.
+     *  @param properties key value pairs with additional info about the event.
+     */
+    public static void trackEvent(final String eventName, final Map<String, String> properties) {
+        MetricsManager.trackEvent(eventName, properties);
+    }
+
+    /**
+     *  This method allows to track an event that happened in your app.
+     *  Remember to choose meaningful event names to have the best experience when diagnosing your app
+     *  in the web portal.
+     *
+     *  @param eventName the name of the event, which should be tracked.
+     *  @param properties key value pairs with additional info about the event.
+     *  @param measurements key value pairs, which contain custom metrics.
+     */
+    public static void trackEvent(final String eventName, final Map<String, String> properties, final Map<String, Double> measurements) {
+        MetricsManager.trackEvent(eventName, properties, measurements);
+    }
     //---------------------------------------------------------------------------------------
     //endregion
 
