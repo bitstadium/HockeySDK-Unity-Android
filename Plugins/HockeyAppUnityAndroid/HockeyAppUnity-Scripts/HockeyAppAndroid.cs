@@ -141,7 +141,7 @@ public class HockeyAppAndroid : MonoBehaviour
 		}
 		else
 		{
-			Debug.Log("Failed to check for update. SDK has not been initialized, yet.");
+			Debug.Log("Failed to track event. SDK has not been initialized, yet.");
 		}
 		#endif
 	}
@@ -166,7 +166,7 @@ public class HockeyAppAndroid : MonoBehaviour
 		}
 		else
 		{
-			Debug.Log("Failed to check for update. SDK has not been initialized, yet.");
+			Debug.Log("Failed to track event. SDK has not been initialized, yet.");
 		}
 		#endif
 	}
@@ -193,7 +193,7 @@ public class HockeyAppAndroid : MonoBehaviour
 		}
 		else
 		{
-			Debug.Log("Failed to check for update. SDK has not been initialized, yet.");
+			Debug.Log("Failed to track event. SDK has not been initialized, yet.");
 		}
 		#endif
 	}
