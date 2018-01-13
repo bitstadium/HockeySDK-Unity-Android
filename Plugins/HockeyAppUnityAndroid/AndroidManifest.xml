@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.hockeyapp.unity"
     android:versionCode="18"
-    android:versionName="5.0.1" >
+    android:versionName="5.1.0" >
 
     <uses-sdk
         android:minSdkVersion="15"
