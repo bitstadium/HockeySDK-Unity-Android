@@ -1,5 +1,20 @@
 ## Changelog
 
+### Version 5.1.1
+
+This release wraps HockeySDK-Android 5.1.0.
+
+#### Changelog for HockeySDK-Android 5.1.0
+
+* **[Bugfix]** Fix issue in persistence logic that could cause Session information to be inaccurate. [#340](https://github.com/bitstadium/HockeySDK-Android/pull/340)
+* **[Improvement]** Remove left-to-right attribute in case the app that integrates the SDK doesn't use that. Thx to [Steven](https://github.com/smuldr) for this contribution. [#335](https://github.com/bitstadium/HockeySDK-Android/pull/335)
+* **[Improvement]** Improve error message for the Feedback feature. [#341](https://github.com/bitstadium/HockeySDK-Android/pull/341)
+* **[Improvement]** It's now possible to call `setUserId` for Feedback. [#339](https://github.com/bitstadium/HockeySDK-Android/pull/339)
+
+### Version 5.1.0
+
+This release adds the missing bindings for the `trackEvent`-api in MetricsManager.java.
+
 ### 5.0.1
 
 This is a bugfix release. If you upgrade from version 1.X, please be aware of the breaking changes in version 5.0.0!
