@@ -8,7 +8,9 @@ using System.Collections.Generic;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+#if UNITY_2017_1_OR_NEWER
 using UnityEngine.Networking;
+#endif 
 
 public class HockeyAppAndroid : MonoBehaviour
 {
@@ -413,7 +415,12 @@ public class HockeyAppAndroid : MonoBehaviour
 		{
 			var sdkName = pluginClass.CallStatic<string>("getSdkName");
 			if (sdkName != null) {
+		#if UNITY_2017_1_OR_NEWER
 				url += "?sdk=" + UnityWebRequest.EscapeURL(sdkName);
+		#else
+				url += "?sdk=" + WWW.EscapeURL(sdkName);
+		#endif
+
 			}
 		}
 		#endif
@@ -423,6 +430,7 @@ public class HockeyAppAndroid : MonoBehaviour
 			string lContent = postForm.headers ["Content-Type"].ToString ();
 			lContent = lContent.Replace ("\"", "");
 
+			#if UNITY_2017_1_OR_NEWER
 			UnityWebRequest postRequest = new UnityWebRequest(url, "POST");
 			postRequest.SetRequestHeader("Content-Type", lContent);
 			postRequest.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
@@ -431,6 +439,14 @@ public class HockeyAppAndroid : MonoBehaviour
 			yield return postRequest.SendWebRequest();
 
 			if (!postRequest.isNetworkError) {
+			#else
+			Dictionary<string, string> headers = new Dictionary<string, string>();
+			headers.Add("Content-Type", lContent);
+			WWW www = new WWW(url, postForm.data, headers);
+			yield return www;
+
+			if (String.IsNullOrEmpty(www.error)) {
+			#endif
 				try {
 					File.Delete (log);
 				} catch (Exception e) {
@@ -439,7 +455,11 @@ public class HockeyAppAndroid : MonoBehaviour
 				}
 			} else {
 				if (Debug.isDebugBuild)
+					#if UNITY_2017_1_OR_NEWER
 					Debug.Log ("Crash sending error: " + postRequest.error);
+					#else
+					Debug.Log("Crash sending error: " + www.error);
+					#endif
 			}
 		}
 	}
