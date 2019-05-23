@@ -1,4 +1,4 @@
-# Version 5.1.1
+# Version 5.2.0
 
 ## Introduction
 
@@ -32,7 +32,7 @@ This document contains the following sections:
 
 * [Changelog](Documentation/Changelog.md)
 * Unity 5.0 or newer (SDK versions with Unity 4 support can be found at the [Unity Asset Store](https://www.assetstore.unity3d.com/en/?gclid=CO) or by switching to the 1.0.3 tag on GitHub).
-* Android API level 15 or later.
+* Android API level 16 or later.
 
 ## <a name="2"></a>Installation & Setup
 
