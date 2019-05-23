@@ -1,5 +1,17 @@
 ## Changelog
 
+### Version 5.2.0
+
+This release wraps HockeySDK-Android 5.2.0.
+
+* **[Improvement]** Replaced obsolete `WWW` request calls with the new `UnityWebRequest` version.
+
+#### Changelog for HockeySDK-Android 5.2.0
+
+* **[Bugfix]** Leaking HTTP connection.
+* **[Bugfix]** Fix HTTPS connection creation. 
+* **[Security]** To enforce TLS 1.2 on all HTTPS connections the SDK makes, we are dropping support for API level 15 (which supports only TLS 1.0), the minimum SDK version thus becomes 16. Previous versions of the SDK were already using TLS 1.2 on API level 16+.
+
 ### Version 5.1.1
 
 This release wraps HockeySDK-Android 5.1.0.
